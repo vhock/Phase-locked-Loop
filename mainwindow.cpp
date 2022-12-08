@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "rputility.h"
 #include "./ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -12,11 +11,5 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-
-void MainWindow::on_sshConnectButton_clicked()
-{
-  auto text= ui->ipAddress->toPlainText().toStdString();
 }
 

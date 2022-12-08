@@ -1,28 +1,27 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(PLLInterface_Cpp VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
-set(VCPKG_TARGET_TRIPLET "x64-windows")
-include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")#might be needed ?
+
 find_package(libssh CONFIG REQUIRED)
-find_package(Boost)
 
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-       rputility.h
-       rputility.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -50,19 +49,12 @@ endif()
 
 target_link_libraries(PLLInterface_Cpp PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(PLLInterface_Cpp PRIVATE ssh)
-target_link_libraries(PLLInterface_Cpp PRIVATE boost)
 
 set_target_properties(PLLInterface_Cpp PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
 )
-
-install(TARGETS PLLInterface_Cpp
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(PLLInterface_Cpp)
