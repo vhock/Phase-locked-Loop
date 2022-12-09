@@ -13,15 +13,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
-include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")#might be needed ?
 
+include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")#might be needed ?
 find_package(libssh CONFIG REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system thread regex date_time )
 
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        rputility.h
+        rputility.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -49,6 +52,7 @@ endif()
 
 target_link_libraries(PLLInterface_Cpp PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(PLLInterface_Cpp PRIVATE ssh)
+target_link_libraries(PLLInterface_Cpp PRIVATE ${Boost_LIBRARIES})
 
 set_target_properties(PLLInterface_Cpp PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
