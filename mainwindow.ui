@@ -17,7 +17,7 @@
    <widget class="QTextEdit" name="ipAddress">
     <property name="geometry">
      <rect>
-      <x>660</x>
+      <x>570</x>
       <y>20</y>
       <width>91</width>
       <height>31</height>
@@ -30,7 +30,7 @@
    <widget class="QPushButton" name="connectButton">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>570</x>
       <y>60</y>
       <width>75</width>
       <height>23</height>
@@ -61,6 +61,29 @@
     </property>
     <property name="placeholderText">
      <string>Disconnected</string>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="connectionIndicator">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>10</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="disconnectButton">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>60</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Disconnect</string>
     </property>
    </widget>
   </widget>

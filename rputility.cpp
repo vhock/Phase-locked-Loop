@@ -89,39 +89,64 @@ int RPUtility::verify_knownhost(ssh_session rp_session)
 
 int RPUtility::connect(std::string ipAddress){
      emit new_message("connecting on thread");
-    auto currID= std::this_thread::get_id();
-    Sleep(5000);
-    emit new_message("connection thread is done sleeping");
+
     ssh_session rp_session = ssh_new();
     if (rp_session == NULL) {
         exit(-1);
     }
-    ssh_options_set(rp_session, SSH_OPTIONS_HOST, "192.168.20.188"); //red pitaya address, needs to be replaced by prompt later
+    ssh_options_set(rp_session, SSH_OPTIONS_HOST, ipAddress.c_str()); //red pitaya address, needs to be replaced by prompt later
     ssh_options_set(rp_session, SSH_OPTIONS_USER, "root");
     ssh_options_set(rp_session, SSH_OPTIONS_PASSWORD_AUTH, "root");
     ssh_options_set(rp_session, SSH_OPTIONS_LOG_VERBOSITY, "3");//
-    ssh_options_set(rp_session,SSH_OPTIONS_TIMEOUT_USEC,"30");
+
 
   int returnValue=   ssh_connect(rp_session);
   if (returnValue == SSH_OK) {
-      std::cout << "SSH Connection Successful\n";
-      std::cout << "Hello Red Pitaya!\n";
-
+      emit new_message("Successfully connected to "+ipAddress+"...");
+      emit connectionStateChanged(0);
   }
   else {
-      std::cout << "SSH Connection failed";
+      emit new_message("Connection to "+ipAddress+" failed");
       return -1;//no need to continue code execution, TODO error handling
   }
 
-  int hostVerifcation = verify_knownhost(rp_session);//check if the host is known for security
-  if (hostVerifcation != 0) {
-      return -1; //verification failed
-  }
+  //TODO skipped for now, but has to be done..
+//  int hostVerifcation = verify_knownhost(rp_session);//check if the host is known for security
+//  if (hostVerifcation != 0) {
+//      return -1; //verification failed
+//  }
 
+  active_session=rp_session; //copy construction, important because if ref to rp_session is used the thread works with undefined memory
 
-  ssh_free(rp_session);
+  std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);
+  monitorSessionThread.detach();
+  //Sleep(50000);
+  return 0;
+ // ssh_free(rp_session);
 }
 
+int RPUtility::disconnect(){
+    if (active_session!=NULL){
+        ssh_disconnect(active_session);
+        return 0;
+    }
+    return -1;
+}
+//never launch me in an undetached thread
+void RPUtility::monitorActiveSession(){
+    while (true){
+       int isConnected= ssh_is_connected(active_session);
+       if (isConnected!=connection_status){
+            connection_status=isConnected;
+            emit connectionStateChanged(isConnected);
+       }
+
+        Sleep(5000);
+        emit new_message("Connection status returned:"+std::to_string(isConnected));
+
+
+    }
+}
 
 
 void RPUtility::fireTestEvent(){

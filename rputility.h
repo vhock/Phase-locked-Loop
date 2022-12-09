@@ -18,18 +18,21 @@
 {
     Q_OBJECT
 public:
+    RPUtility();
     static bool isValidIPAddress(std::string ipAddress);
     int connect(std::string ipAddress);
     void fireTestEvent();
-    RPUtility();
+    void monitorActiveSession();
+    int disconnect();
  signals:
     void new_message(std::string message);
+    void connectionStateChanged(int code);
 private:
-    ssh_session rp_session;
+    ssh_session active_session;
     std::string last_message;
     int verify_knownhost(ssh_session rp_session);
-   static int startConnection(ssh_session rp_session);
-
+    static int startConnection(ssh_session rp_session);
+    int connection_status=0; //0 disconnected, 1 connected
 
 };
 

@@ -7,8 +7,21 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow),rpUtility()
 {
     ui->setupUi(this);
-   int success= qRegisterMetaType<std::string>();
+    qRegisterMetaType<std::string>();
+   // qRegisterMetaType<int>();
+
+
     QObject::connect(&rpUtility,&RPUtility::new_message,this,&MainWindow::logMessages,Qt::AutoConnection);
+    QObject::connect(&rpUtility,&RPUtility::connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
+
+    connectionIndicatorScene = new QGraphicsScene(this);
+
+    ui->connectionIndicator->setScene(connectionIndicatorScene);
+    ui->connectionIndicator->show();
+    connectionIndicatorScene->setBackgroundBrush(Qt::red); //offline
+    connectionIndicatorScene->addText("Offline");
+    // a blue background
+
 }
 
 MainWindow::~MainWindow()
@@ -19,8 +32,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_connectButton_clicked()
 {
-std::string text= ui->ipAddress->toPlainText().toStdString();
-bool isValidIP=RPUtility::isValidIPAddress(text);
+std::string ipAddressText= ui->ipAddress->toPlainText().toStdString();
+bool isValidIP=RPUtility::isValidIPAddress(ipAddressText);
 if (!isValidIP){
     logMessages("Invalid IP");
     return;
@@ -29,11 +42,11 @@ if (!isValidIP){
     auto currID= std::this_thread::get_id();
 
 
-    std::thread connectionThread(&RPUtility::connect,&rpUtility,text);
+    std::thread connectionThread(&RPUtility::connect,&rpUtility,ipAddressText);
     connectionThread.detach();
-    // blocking fucker std::future<int> connectValue=std::async(&RPUtility::connect,&rpUtility,text);
     logMessages("detached");
-
+    //Sleep(30000);
+    //rpUtility.disconnect();
   //int connectionSuccessful= rpUtility.connect(text);
     logMessages("main thread continues");
 
@@ -41,17 +54,37 @@ if (!isValidIP){
 
 }
 }
-
+//slots
 void MainWindow::logMessages(std::string message){
    QString qstring= QString::fromStdString(message);
      ui->statusBox->setText(qstring);
      ui->logBox->append(qstring);
 };
 
+void  MainWindow::connectionStateChangedListener(int code){
+    if (code==1){
+        connectionIndicatorScene->clear();//i do not want to bother with finding the text for now
+        connectionIndicatorScene->setBackgroundBrush(Qt::green); //online
+        connectionIndicatorScene->addText("Online");
+    }
+    if (code==0){
+        connectionIndicatorScene->clear();//i do not want to bother with finding the text for now
+        connectionIndicatorScene->setBackgroundBrush(Qt::red); //online
+        connectionIndicatorScene->addText("Offline");
+    }
+
+
+}
 
 
 
 
 
 
+
+
+void MainWindow::on_disconnectButton_clicked()
+{
+    rpUtility.disconnect();
+}
 
