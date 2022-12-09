@@ -30,7 +30,7 @@ public:
 private:
     ssh_session active_session;
     std::string last_message;
-    int verify_knownhost(ssh_session rp_session);
+    int verify_knownhost();
     static int startConnection(ssh_session rp_session);
     int connection_status=0; //0 disconnected, 1 connected
 

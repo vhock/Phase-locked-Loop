@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
     connectionIndicatorScene->addText("Offline");
     // a blue background
 
+    ui->ipAddress->setText("192.168.20.203"); //TODO for debugging, delete later
+
 }
 
 MainWindow::~MainWindow()

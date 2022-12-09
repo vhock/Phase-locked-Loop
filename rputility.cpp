@@ -11,7 +11,7 @@ bool RPUtility::isValidIPAddress(std::string ipAddress){
     return true;
 }
 
-int RPUtility::verify_knownhost(ssh_session rp_session)
+int RPUtility::verify_knownhost()
 {
     enum ssh_known_hosts_e state;
     unsigned char* hash = NULL;
@@ -22,7 +22,7 @@ int RPUtility::verify_knownhost(ssh_session rp_session)
     char* p;
     int cmp;
     int rc;
-    rc = ssh_get_server_publickey(rp_session, &srv_pubkey);
+    rc = ssh_get_server_publickey(active_session, &srv_pubkey);
     if (rc < 0) {
         return -1;
     }
@@ -34,7 +34,7 @@ int RPUtility::verify_knownhost(ssh_session rp_session)
     if (rc < 0) {
         return -1;
     }
-    state = ssh_session_is_known_server(rp_session);
+    state = ssh_session_is_known_server(active_session);
     switch (state) {
     case SSH_KNOWN_HOSTS_OK:
         /* OK */
@@ -71,14 +71,14 @@ int RPUtility::verify_knownhost(ssh_session rp_session)
         if (cmp != 0) {
             return -1;
         }
-        rc = ssh_session_update_known_hosts(rp_session);
+        rc = ssh_session_update_known_hosts(active_session);
         if (rc < 0) {
             fprintf(stderr, "Error %s\n", strerror_s(buf,800,errno));
             return -1;
         }
         break;
     case SSH_KNOWN_HOSTS_ERROR:
-        fprintf(stderr, "Error %s", ssh_get_error(rp_session));
+        fprintf(stderr, "Error %s", ssh_get_error(active_session));
         ssh_clean_pubkey_hash(&hash);
         return -1;
     }
@@ -100,6 +100,7 @@ int RPUtility::connect(std::string ipAddress){
     ssh_options_set(rp_session, SSH_OPTIONS_LOG_VERBOSITY, "3");//
 
 
+
   int returnValue=   ssh_connect(rp_session);
   if (returnValue == SSH_OK) {
       emit new_message("Successfully connected to "+ipAddress+"...");
@@ -117,7 +118,16 @@ int RPUtility::connect(std::string ipAddress){
 //  }
 
   active_session=rp_session; //copy construction, important because if ref to rp_session is used the thread works with undefined memory
-
+  verify_knownhost();
+  int auth=ssh_userauth_password(active_session,"root","root");
+  if (auth != SSH_AUTH_SUCCESS)
+  {
+    fprintf(stderr, "Error authenticating with password: %s\n",
+            ssh_get_error(rp_session));
+    ssh_disconnect(rp_session);
+    ssh_free(rp_session);
+    exit(-1);
+  }
   std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);
   monitorSessionThread.detach();
   //Sleep(50000);
@@ -135,15 +145,31 @@ int RPUtility::disconnect(){
 //never launch me in an undetached thread
 void RPUtility::monitorActiveSession(){
     while (true){
-       int isConnected= ssh_is_connected(active_session);
+       int isConnected=0;
+       ssh_channel channel;
+       int rc;
+       channel = ssh_channel_new(active_session);
+       rc = ssh_channel_open_session(channel);
+       if (rc == SSH_ERROR){
+           isConnected=0;
+
+       }else {//all good
+           isConnected=1;
+           ssh_channel_close(channel);
+           ssh_channel_free(channel);
+
+       }
+       //something changed, emit the according message
        if (isConnected!=connection_status){
             connection_status=isConnected;
-            emit connectionStateChanged(isConnected);
+            emit connectionStateChanged(connection_status);
+            if (connection_status==0){
+                emit new_message("Connection lost:"+std::to_string(rc));
+            }else if (connection_status==1){
+                emit new_message("Connection established:"+std::to_string(rc));
+            }
        }
-
-        Sleep(5000);
-        emit new_message("Connection status returned:"+std::to_string(isConnected));
-
+       Sleep(5000); //checking on the connection every few seconds is enough
 
     }
 }
