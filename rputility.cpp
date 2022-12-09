@@ -119,14 +119,16 @@ int RPUtility::connect(std::string ipAddress){
 
   active_session=rp_session; //copy construction, important because if ref to rp_session is used the thread works with undefined memory
   verify_knownhost();
-  int auth=ssh_userauth_password(active_session,"root","root");
+  int auth=ssh_userauth_password(active_session,"root","roottotototot");
   if (auth != SSH_AUTH_SUCCESS)
   {
+    emit new_message("Authentication failed:"+std::string(ssh_get_error(rp_session)));
+
     fprintf(stderr, "Error authenticating with password: %s\n",
             ssh_get_error(rp_session));
     ssh_disconnect(rp_session);
     ssh_free(rp_session);
-    exit(-1);
+    return -1;
   }
   std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);
   monitorSessionThread.detach();
@@ -157,7 +159,6 @@ void RPUtility::monitorActiveSession(){
            isConnected=1;
            ssh_channel_close(channel);
            ssh_channel_free(channel);
-
        }
        //something changed, emit the according message
        if (isConnected!=connection_status){
