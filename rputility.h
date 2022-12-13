@@ -23,7 +23,7 @@ public:
     static bool isValidIPAddress(std::string ipAddress);
     int connect(std::string ipAddress);
     int disconnect();
-    int sendCommand(std::string command);
+    int sendCommand(std::string command,std::string &serverReply);
 
  signals:
     void new_message(std::string message);

@@ -99,6 +99,7 @@ void MainWindow::on_disconnectButton_clicked()
 void MainWindow::on_execTestCommandBtn_clicked()
 {
    auto command= ui->commandBox->toPlainText().toStdString();
-    rpUtility.sendCommand(command);
+   std::string answer{};
+    rpUtility.sendCommand(command,answer);
 }
 

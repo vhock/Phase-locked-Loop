@@ -1,11 +1,13 @@
 #include "rputility.h"
 
 
-int RPUtility::sendCommand(std::string command){
+int RPUtility::sendCommand(std::string command,std::string &serverReply){
     int rc;
-    char buffer[2];
+    char buffer[1];
     int nbytes;
     ssh_channel  channel = ssh_channel_new(active_session);
+    std::string receive = "";
+
 
     int sessionOK=ssh_channel_open_session(channel);
      if (sessionOK == SSH_ERROR){
@@ -19,16 +21,20 @@ int RPUtility::sendCommand(std::string command){
     }
    //channel_read(channel, buffer, sizeof(buffer),0);
    emit new_message("Buffer content:");
-    while ((rc = channel_read(channel, buffer, sizeof(buffer), 0)) > 0) {
-        emit new_message(buffer);
+   nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0); //TODO how about is_stderr=1?
+      while (nbytes > 0)
+      {
+              receive.append(buffer, nbytes);
+              nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
+      }
 
-        if (fwrite(buffer, 1, rc, stdout) != (unsigned int) rc) {
-            return -1;
-        }
-    }
+      emit new_message(receive); //this still contains a \n character
+
+
     ssh_channel_send_eof(channel);
     ssh_channel_close(channel);
     ssh_channel_free(channel);
+
 
     return SSH_OK;
 }
