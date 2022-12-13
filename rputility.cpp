@@ -1,6 +1,37 @@
 #include "rputility.h"
 
 
+int RPUtility::sendCommand(std::string command){
+    int rc;
+    char buffer[2];
+    int nbytes;
+    ssh_channel  channel = ssh_channel_new(active_session);
+
+    int sessionOK=ssh_channel_open_session(channel);
+     if (sessionOK == SSH_ERROR){
+         return -1;
+     }
+
+    rc = channel_request_exec(channel, command.c_str());
+    if (rc ==SSH_ERROR) {
+        emit new_message(ssh_get_error(active_session));
+        return -1;
+    }
+   //channel_read(channel, buffer, sizeof(buffer),0);
+   emit new_message("Buffer content:");
+    while ((rc = channel_read(channel, buffer, sizeof(buffer), 0)) > 0) {
+        emit new_message(buffer);
+
+        if (fwrite(buffer, 1, rc, stdout) != (unsigned int) rc) {
+            return -1;
+        }
+    }
+    ssh_channel_send_eof(channel);
+    ssh_channel_close(channel);
+    ssh_channel_free(channel);
+
+    return SSH_OK;
+}
 
 bool RPUtility::isValidIPAddress(std::string ipAddress){
     boost::system::error_code ec;
@@ -88,63 +119,89 @@ int RPUtility::verify_knownhost()
 
 
 int RPUtility::connect(std::string ipAddress){
-     emit new_message("connecting on thread");
+     emit new_message("Establishing connection to "+ipAddress);
 
     ssh_session rp_session = ssh_new();
     if (rp_session == NULL) {
         exit(-1);
     }
     ssh_options_set(rp_session, SSH_OPTIONS_HOST, ipAddress.c_str()); //red pitaya address, needs to be replaced by prompt later
-    ssh_options_set(rp_session, SSH_OPTIONS_USER, "root");
-    ssh_options_set(rp_session, SSH_OPTIONS_PASSWORD_AUTH, "root");
     ssh_options_set(rp_session, SSH_OPTIONS_LOG_VERBOSITY, "3");//
-
-
 
   int returnValue=   ssh_connect(rp_session);
   if (returnValue == SSH_OK) {
       emit new_message("Successfully connected to "+ipAddress+"...");
-      emit connectionStateChanged(0);
   }
   else {
-      emit new_message("Connection to "+ipAddress+" failed");
+      emit new_message("Connection to "+ipAddress+" failed."+std::string(ssh_get_error(rp_session)));
       return -1;//no need to continue code execution, TODO error handling
   }
 
   //TODO skipped for now, but has to be done..
-//  int hostVerifcation = verify_knownhost(rp_session);//check if the host is known for security
+ // verify_knownhost(rp_session);
+
+//int hostVerifcation = verify_knownhost(rp_session);//check if the host is known for security
 //  if (hostVerifcation != 0) {
 //      return -1; //verification failed
 //  }
 
-  active_session=rp_session; //copy construction, important because if ref to rp_session is used the thread works with undefined memory
-  verify_knownhost();
-  int auth=ssh_userauth_password(active_session,"root","roottotototot");
+ //Authentication
+  int auth=ssh_userauth_password(rp_session,"root","root");
   if (auth != SSH_AUTH_SUCCESS)
   {
     emit new_message("Authentication failed:"+std::string(ssh_get_error(rp_session)));
-
-    fprintf(stderr, "Error authenticating with password: %s\n",
-            ssh_get_error(rp_session));
     ssh_disconnect(rp_session);
     ssh_free(rp_session);
     return -1;
+  }else {
+      emit new_message("Authentication successful:"+std::string(ssh_get_error(rp_session)));
+
   }
+
+  active_session=rp_session; //copy construction, important because if ref to rp_session is used the thread works with undefined memory
+  emit connectionStateChanged(0);
   std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);
   monitorSessionThread.detach();
-  //Sleep(50000);
   return 0;
- // ssh_free(rp_session);
 }
 
+int RPUtility::authenticate(ssh_session rp_session,std::string user,std::string password){
+    int auth=ssh_userauth_password(rp_session,user.c_str(),password.c_str());
+    if (auth != SSH_AUTH_SUCCESS)
+    {
+      emit new_message("Authentication failed:"+std::string(ssh_get_error(rp_session)));
+      ssh_disconnect(rp_session);
+      ssh_free(rp_session);
+      return -1;
+    }
+
+}
+
+
+
+//TODO buggy, disabled for now
 int RPUtility::disconnect(){
-    if (active_session!=NULL){
-        ssh_disconnect(active_session);
-        return 0;
+    if (active_session!=nullptr&&connection_status==1){
+        try{
+          int sessionstatus=ssh_get_status(active_session);
+          ssh_disconnect(active_session);
+          ssh_free(active_session);
+          connection_status=0;
+          emit connectionStateChanged(connection_status);
+          emit new_message("Disconnected");
+          return 0;
+        }catch (...){
+         int x=4;
+        }
     }
     return -1;
 }
+
+
 //never launch me in an undetached thread
+/*
+ * This method checks if the connection to the Red Pitaya is still active, every 5 seconds
+ */
 void RPUtility::monitorActiveSession(){
     while (true){
        int isConnected=0;
@@ -176,9 +233,46 @@ void RPUtility::monitorActiveSession(){
 }
 
 
-void RPUtility::fireTestEvent(){
-    emit new_message("signal from red pitaya test test");
+
+int interactive_shell_session(ssh_channel channel)
+{
+  /* Session and terminal initialization skipped */
+
+ int rc=0;
+  char buffer[256];
+  int nbytes, nwritten;
+
+  while (ssh_channel_is_open(channel) &&
+         !ssh_channel_is_eof(channel))
+  {
+    nbytes = ssh_channel_read_nonblocking(channel, buffer, sizeof(buffer), 0);
+    if (nbytes < 0) return SSH_ERROR;
+    if (nbytes > 0)
+    {
+       // fwrite(buffer, 1, rc, stdout)
+      nwritten = fwrite(buffer, 1, rc, stdout);
+      if (nwritten != nbytes) return SSH_ERROR;
+
+    if (!_kbhit())
+    {
+      Sleep(50000L); // 0.05 second
+      continue;
+    }
+
+
+    nbytes = fread( buffer, sizeof(char), 10, stdin);
+    if (nbytes < 0) return SSH_ERROR;
+    if (nbytes > 0)
+    {
+      nwritten = ssh_channel_write(channel, buffer, nbytes);
+      if (nwritten != nbytes) return SSH_ERROR;
+    }
+  }
+
+  return rc;
 }
+}
+
 RPUtility::RPUtility()
 {
 

@@ -5,15 +5,16 @@
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
 #endif
-#include <iostream>
 #include <boost/asio.hpp>
 #include<libssh/libssh.h>
 #include<thread>
-
+#include <iostream>
+#include <conio.h>
 #include <stdlib.h>     //for using the function sleep
-
+#include <exception>
 #include <QObject>
-
+#include <stdio.h>
+#include <stdlib.h>
  class RPUtility : public QObject
 {
     Q_OBJECT
@@ -21,18 +22,22 @@ public:
     RPUtility();
     static bool isValidIPAddress(std::string ipAddress);
     int connect(std::string ipAddress);
-    void fireTestEvent();
-    void monitorActiveSession();
     int disconnect();
+    int sendCommand(std::string command);
+
  signals:
     void new_message(std::string message);
     void connectionStateChanged(int code);
 private:
     ssh_session active_session;
     std::string last_message;
-    int verify_knownhost();
-    static int startConnection(ssh_session rp_session);
     int connection_status=0; //0 disconnected, 1 connected
+    int verify_knownhost();
+    int authenticate(ssh_session,std::string,std::string);
+    int openChannel(ssh_session session);
+    void monitorActiveSession();
+
+
 
 };
 

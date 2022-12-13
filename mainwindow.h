@@ -28,6 +28,8 @@ private slots:
 
     void on_disconnectButton_clicked();
 
+    void on_execTestCommandBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
     RPUtility rpUtility;

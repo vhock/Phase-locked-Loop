@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     connectionIndicatorScene->addText("Offline");
     // a blue background
 
-    ui->ipAddress->setText("192.168.20.203"); //TODO for debugging, delete later
+    ui->ipAddress->setText("192.168.20.188"); //TODO for debugging, delete later
 
 }
 
@@ -68,11 +68,16 @@ void  MainWindow::connectionStateChangedListener(int code){
         connectionIndicatorScene->clear();//i do not want to bother with finding the text for now
         connectionIndicatorScene->setBackgroundBrush(Qt::green); //online
         connectionIndicatorScene->addText("Online");
+        ui->disconnectButton->setEnabled(true);
+        ui->connectButton->setEnabled(false);
+
     }
     if (code==0){
         connectionIndicatorScene->clear();//i do not want to bother with finding the text for now
         connectionIndicatorScene->setBackgroundBrush(Qt::red); //online
         connectionIndicatorScene->addText("Offline");
+        ui->disconnectButton->setEnabled(false);
+        ui->connectButton->setEnabled(true);
     }
 
 
@@ -88,5 +93,12 @@ void  MainWindow::connectionStateChangedListener(int code){
 void MainWindow::on_disconnectButton_clicked()
 {
     rpUtility.disconnect();
+}
+
+
+void MainWindow::on_execTestCommandBtn_clicked()
+{
+   auto command= ui->commandBox->toPlainText().toStdString();
+    rpUtility.sendCommand(command);
 }
 
