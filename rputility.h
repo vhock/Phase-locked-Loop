@@ -24,6 +24,7 @@ public:
     int connect(std::string ipAddress);
     int disconnect();
     int sendCommand(std::string command,std::string &serverReply);
+    int scp_helloworld();
 
  signals:
     void new_message(std::string message);

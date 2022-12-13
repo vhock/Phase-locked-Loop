@@ -28,13 +28,13 @@ int RPUtility::sendCommand(std::string command,std::string &serverReply){
               nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
       }
 
-      emit new_message(receive); //this still contains a \n character
+      emit new_message(receive); // TODO this still contains a \n character
 
 
     ssh_channel_send_eof(channel);
     ssh_channel_close(channel);
     ssh_channel_free(channel);
-
+    serverReply=receive;
 
     return SSH_OK;
 }
@@ -126,7 +126,6 @@ int RPUtility::verify_knownhost()
 
 int RPUtility::connect(std::string ipAddress){
      emit new_message("Establishing connection to "+ipAddress);
-
     ssh_session rp_session = ssh_new();
     if (rp_session == NULL) {
         exit(-1);
@@ -164,9 +163,9 @@ int RPUtility::connect(std::string ipAddress){
 
   }
 
-  active_session=rp_session; //copy construction, important because if ref to rp_session is used the thread works with undefined memory
-  emit connectionStateChanged(0);
-  std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);
+  active_session=rp_session; //copy construction, important because if ref to rp_session is used all other threads works with undefined memory
+  emit connectionStateChanged(1);
+  std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);// launch a thread which monitors the active session
   monitorSessionThread.detach();
   return 0;
 }
@@ -207,16 +206,22 @@ int RPUtility::disconnect(){
 //never launch me in an undetached thread
 /*
  * This method checks if the connection to the Red Pitaya is still active, every 5 seconds
+ * In debug mode, this method may cause issues
  */
 void RPUtility::monitorActiveSession(){
+    int isConnected=1;//when this method is called, connection_status is equal 1
     while (true){
-       int isConnected=0;
        ssh_channel channel;
        int rc;
        channel = ssh_channel_new(active_session);
+       ssh_channel_set_blocking(channel,true);
+       if (ssh_channel_is_closed(channel)==0){
+return ;
+       }
        rc = ssh_channel_open_session(channel);
-       if (rc == SSH_ERROR){
+       if (rc == SSH_ERROR){//connection lost
            isConnected=0;
+           emit new_message(std::string(ssh_get_error(active_session)));
 
        }else {//all good
            isConnected=1;
@@ -238,6 +243,59 @@ void RPUtility::monitorActiveSession(){
     }
 }
 
+int RPUtility::scp_helloworld()
+{
+    ssh_scp scp;
+    int rc;
+
+    scp = ssh_scp_new
+      (active_session, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, "/tmp/");
+    if (scp == NULL)
+    {
+      fprintf(stderr, "Error allocating scp session: %s\n",
+              ssh_get_error(active_session));
+      return SSH_ERROR;
+    }
+ int status=ssh_get_status(active_session) ;
+    rc = ssh_scp_init(scp);
+    if (rc != SSH_OK)
+    {
+        emit new_message("Error initializing scp session: %s\n"+
+                         std::string(ssh_get_error(active_session)));
+      fprintf(stderr, "Error initializing scp session: %s\n",
+              ssh_get_error(active_session));
+      ssh_scp_free(scp);
+      return rc;
+    }
+  const char *helloworld = "Hello, world!\n";
+  int length = strlen(helloworld);
+  rc = ssh_scp_push_directory(scp, "helloworld", 0200);
+  if (rc != SSH_OK)
+  {
+    fprintf(stderr, "Can't create remote directory: %s\n",
+            ssh_get_error(active_session));
+    return rc;
+  }
+
+  rc = ssh_scp_push_file
+    (scp, "helloworld.txt", length, 0400 |  0200);
+  if (rc != SSH_OK)
+  {
+    fprintf(stderr, "Can't open remote file: %s\n",
+            ssh_get_error(active_session));
+    return rc;
+  }
+
+  rc = ssh_scp_write(scp, helloworld, length);
+  if (rc != SSH_OK)
+  {
+    fprintf(stderr, "Can't write to remote file: %s\n",
+            ssh_get_error(active_session));
+    return rc;
+  }
+
+  return SSH_OK;
+}
 
 
 int interactive_shell_session(ssh_channel channel)

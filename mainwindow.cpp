@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->connectionIndicator->show();
     connectionIndicatorScene->setBackgroundBrush(Qt::red); //offline
     connectionIndicatorScene->addText("Offline");
-    // a blue background
+    // a red background
 
     ui->ipAddress->setText("192.168.20.188"); //TODO for debugging, delete later
 
@@ -101,5 +101,6 @@ void MainWindow::on_execTestCommandBtn_clicked()
    auto command= ui->commandBox->toPlainText().toStdString();
    std::string answer{};
     rpUtility.sendCommand(command,answer);
+    rpUtility.scp_helloworld();
 }
 
