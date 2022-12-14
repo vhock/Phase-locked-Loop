@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>stuff/testfile.txt</file>
+        <file>testfile.txt</file>
+        <file>knight_rider.bit</file>
+    </qresource>
+</RCC>

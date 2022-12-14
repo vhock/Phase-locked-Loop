@@ -6,7 +6,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,7 +16,7 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")#might be needed ?
 find_package(libssh CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread regex date_time )
-
+set(CMAKE_AUTORCC ON)
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
@@ -25,7 +24,13 @@ set(PROJECT_SOURCES
         mainwindow.ui
         rputility.h
         rputility.cpp
+        resources.qrc
+        testfile.txt
+        knight_rider.bit
 )
+set(RESOURCE_FILES
+  knight_rider.bit
+  testfile.txt)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(PLLInterface_Cpp
@@ -58,7 +63,8 @@ set_target_properties(PLLInterface_Cpp PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-)
+    RESOURCE "${RESOURCE_FILES}"
+    )
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(PLLInterface_Cpp)

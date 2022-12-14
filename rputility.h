@@ -15,6 +15,10 @@
 #include <QObject>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
+#include <QResource>
+#include <Qfile>
+// std::ifstream
  class RPUtility : public QObject
 {
     Q_OBJECT

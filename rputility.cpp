@@ -165,8 +165,8 @@ int RPUtility::connect(std::string ipAddress){
 
   active_session=rp_session; //copy construction, important because if ref to rp_session is used all other threads works with undefined memory
   emit connectionStateChanged(1);
-  std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);// launch a thread which monitors the active session
-  monitorSessionThread.detach();
+ // std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);// launch a thread which monitors the active session
+ // monitorSessionThread.detach();
   return 0;
 }
 
@@ -267,7 +267,23 @@ int RPUtility::scp_helloworld()
       ssh_scp_free(scp);
       return rc;
     }
-  const char *helloworld = "Hello, world!\n";
+    //simple text file
+   QFile qfile(":/testfile.txt");
+   bool qFileExists=qfile.exists();
+   qfile.open(QIODevice::ReadOnly);
+   std::string fileContent= qfile.readAll().toStdString();
+   fileContent.c_str();
+
+   QFile knightRider(":/knight_rider.bit");
+   bool kRxists=qfile.exists();
+   knightRider.open(QIODevice::ReadOnly);
+   QByteArray blob = knightRider.readAll();
+
+
+
+
+
+  const char *helloworld =fileContent.c_str(); //"Hello, world!\n";
   int length = strlen(helloworld);
   rc = ssh_scp_push_directory(scp, "helloworld", 0200);
   if (rc != SSH_OK)
@@ -277,8 +293,30 @@ int RPUtility::scp_helloworld()
     return rc;
   }
 
+//  rc = ssh_scp_push_file
+//    (scp, "helloworld.txt", length, 0400 |  0200);
+//  if (rc != SSH_OK)
+//  {
+//    fprintf(stderr, "Can't open remote file: %s\n",
+//            ssh_get_error(active_session));
+//    return rc;
+//  }
+
+//  rc = ssh_scp_write(scp, helloworld, length);
+//  if (rc != SSH_OK)
+//  {
+//    fprintf(stderr, "Can't write to remote file: %s\n",
+//            ssh_get_error(active_session));
+//    return rc;
+//  }
+
+
+
+  length=blob.length();
+
+  //knight rider
   rc = ssh_scp_push_file
-    (scp, "helloworld.txt", length, 0400 |  0200);
+    (scp, "knight_rider_copied.bit", length, 0400 |  0200);
   if (rc != SSH_OK)
   {
     fprintf(stderr, "Can't open remote file: %s\n",
@@ -286,13 +324,14 @@ int RPUtility::scp_helloworld()
     return rc;
   }
 
-  rc = ssh_scp_write(scp, helloworld, length);
+  rc = ssh_scp_write(scp, blob, length);
   if (rc != SSH_OK)
   {
     fprintf(stderr, "Can't write to remote file: %s\n",
             ssh_get_error(active_session));
     return rc;
   }
+
 
   return SSH_OK;
 }
