@@ -25,10 +25,10 @@ set(PROJECT_SOURCES
         rputility.h
         rputility.cpp
         resources.qrc
-        knight_rider.bit
+        pll_project.bit
 )
 set(RESOURCE_FILES
-  knight_rider.bit
+  pll_project.bit
  )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

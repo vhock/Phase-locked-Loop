@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>knight_rider.bit</file>
+        <file>pll_project.bit</file>
     </qresource>
 </RCC>

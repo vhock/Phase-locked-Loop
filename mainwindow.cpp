@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "rputility.h"
+#include <QLabel>
+#include <QtGlobal>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,7 +24,16 @@ MainWindow::MainWindow(QWidget *parent)
     connectionIndicatorScene->addText("Offline");
     // a red background
 
+    QLabel * f0Label=new QLabel(ui->pll1_f0_box);
+    f0Label->setText("f0 for PLL1");
+
     ui->ipAddress->setText("192.168.20.188"); //TODO for debugging, delete later
+
+    //connect UI parameter fields to the Red Pitaya utility
+QSpinBox* spinbox=ui->pll1_f0_box;
+QSpinBox& sprf=*spinbox;
+     QObject::connect(spinbox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
+
 
 }
 
@@ -104,4 +115,7 @@ void MainWindow::on_execTestCommandBtn_clicked()
     rpUtility.scp_copyBitfile();
     rpUtility.executeBitfile();
 }
+
+
+
 
