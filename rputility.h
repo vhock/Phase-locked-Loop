@@ -19,7 +19,7 @@
 #include <QResource>
 #include <Qfile>
 // std::ifstream
- class RPUtility : public QObject
+class RPUtility : public QObject
 {
     Q_OBJECT
 public:
@@ -28,12 +28,21 @@ public:
     int connect(std::string ipAddress);
     int disconnect();
     int sendCommand(std::string command,std::string &serverReply);
-    int scp_helloworld();
+    int scp_copyBitfile();
+    int executeBitfile();
 
- signals:
-    void new_message(std::string message);
+
+signals:
+    void log_message(std::string message);
     void connectionStateChanged(int code);
 private:
+    static const std::string XDEVCFG_DIR;
+    static const std::string PLL_BITFILE;
+    static const std::string RP_MONITOR_COMMAND;
+    static const std::string  TMPLOCATION;
+    static const std::string RP_FILEXISTS_COMMAND;
+    static const std::string  RP_EXECUTE_BITFILE_COMMAND;
+
     ssh_session active_session;
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected

@@ -25,12 +25,11 @@ set(PROJECT_SOURCES
         rputility.h
         rputility.cpp
         resources.qrc
-        testfile.txt
         knight_rider.bit
 )
 set(RESOURCE_FILES
   knight_rider.bit
-  testfile.txt)
+ )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(PLLInterface_Cpp

@@ -8,10 +8,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     qRegisterMetaType<std::string>();
-   // qRegisterMetaType<int>();
+    // qRegisterMetaType<int>();
 
 
-    QObject::connect(&rpUtility,&RPUtility::new_message,this,&MainWindow::logMessages,Qt::AutoConnection);
+    QObject::connect(&rpUtility,&RPUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
     QObject::connect(&rpUtility,&RPUtility::connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
 
     connectionIndicatorScene = new QGraphicsScene(this);
@@ -34,33 +34,33 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_connectButton_clicked()
 {
-std::string ipAddressText= ui->ipAddress->toPlainText().toStdString();
-bool isValidIP=RPUtility::isValidIPAddress(ipAddressText);
-if (!isValidIP){
-    logMessages("Invalid IP");
-    return;
-}else {
-    logMessages("Valid IP");
-    auto currID= std::this_thread::get_id();
+    std::string ipAddressText= ui->ipAddress->toPlainText().toStdString();
+    bool isValidIP=RPUtility::isValidIPAddress(ipAddressText);
+    if (!isValidIP){
+        logMessages("Invalid IP");
+        return;
+    }else {
+        logMessages("Valid IP");
+        auto currID= std::this_thread::get_id();
 
 
-    std::thread connectionThread(&RPUtility::connect,&rpUtility,ipAddressText);
-    connectionThread.detach();
-    logMessages("detached");
-    //Sleep(30000);
-    //rpUtility.disconnect();
-  //int connectionSuccessful= rpUtility.connect(text);
-    logMessages("main thread continues");
+        std::thread connectionThread(&RPUtility::connect,&rpUtility,ipAddressText);
+        connectionThread.detach();
+        logMessages("detached");
+        //Sleep(30000);
+        //rpUtility.disconnect();
+        //int connectionSuccessful= rpUtility.connect(text);
+        logMessages("main thread continues");
 
-  int x=4;
+        int x=4;
 
-}
+    }
 }
 //slots
 void MainWindow::logMessages(std::string message){
-   QString qstring= QString::fromStdString(message);
-     ui->statusBox->setText(qstring);
-     ui->logBox->append(qstring);
+    QString qstring= QString::fromStdString(message);
+    ui->statusBox->setText(qstring);
+    ui->logBox->append(qstring);
 };
 
 void  MainWindow::connectionStateChangedListener(int code){
@@ -98,9 +98,10 @@ void MainWindow::on_disconnectButton_clicked()
 
 void MainWindow::on_execTestCommandBtn_clicked()
 {
-   auto command= ui->commandBox->toPlainText().toStdString();
-   std::string answer{};
+    auto command= ui->commandBox->toPlainText().toStdString();
+    std::string answer{};
     rpUtility.sendCommand(command,answer);
-    rpUtility.scp_helloworld();
+    rpUtility.scp_copyBitfile();
+    rpUtility.executeBitfile();
 }
 
