@@ -49,8 +49,21 @@ private:
     static const std::string  TMPLOCATION;
     static const std::string RP_FILEXISTS_COMMAND;
     static const std::string  RP_EXECUTE_BITFILE_COMMAND;
-    static const std::map<std::string,const std::array<int,3>> param_dict;
-    ssh_session active_session;
+  const std::map<std::string, std::array<int,3>> param_dict{{"2nd_harm", {0, 7, 7}},
+                                                        {"pid_en",   {0, 6, 6}},
+                                                        {"w_a",      {8, 15, 8}},
+                                                        {"w_b",      {8, 7, 0}},
+                                                        {"kp",       {0x10000, 31, 0}},
+                                                        {"ki",       {0x10008, 31, 0}},
+                                                        {"f0",       {0x20000, 31, 0}},
+                                                        {"bw",       {0x20008, 31, 0}},
+                                                        {"alpha",    {0x30000, 26, 10}},
+                                                        {"order",    {0x30000, 2, 0}},
+                                                        {"fNCO",     {0x40000,31,0}},//more a signal
+                                                        {"fNCOErr",  {0x50000,31,0}}//more a signal
+                                                       };
+
+    ssh_session active_session=NULL;
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected
     int verify_knownhost();

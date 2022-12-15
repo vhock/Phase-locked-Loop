@@ -3,38 +3,25 @@
 //constants
 const std::string RPUtility::XDEVCFG_DIR="/dev/xdevcfg";
 const std::string RPUtility::PLL_BITFILE="pll_project.bit";
-const std::string RPUtility::RP_MONITOR_COMMAND="/opt/redpitaya/bin/monitor";
+const std::string RPUtility::RP_MONITOR_COMMAND="/opt/redpitaya/bin/monitor ";
 const std::string RPUtility::TMPLOCATION="/tmp/";
 const std::string RPUtility::RP_FILEXISTS_COMMAND="test -f "+TMPLOCATION+PLL_BITFILE+"&& echo 1";
 const std::string RPUtility::RP_EXECUTE_BITFILE_COMMAND="cat "+TMPLOCATION+PLL_BITFILE+" >/dev/xdevcfg";
 
 int pll_base_addr[2] = {0x41200000, 0x41300000};
-std::map<std::string, std::array<int,3>> param_dict{{"2nd_harm", {0, 7, 7}},
-                                                    {"pid_en",   {0, 6, 6}},
-                                                    {"w_a",      {8, 15, 8}},
-                                                    {"w_b",      {8, 7, 0}},
-                                                    {"kp",       {0x10000, 31, 0}},
-                                                    {"ki",       {0x10008, 31, 0}},
-                                                    {"f0",       {0x20000, 31, 0}},
-                                                    {"bw",       {0x20008, 31, 0}},
-                                                    {"alpha",    {0x30000, 26, 10}},
-                                                    {"order",    {0x30000, 2, 0}},
-                                                    {"fNCO",     {0x40000,31,0}},//more a signal
-                                                    {"fNCOErr",  {0x50000,31,0}}//more a signal
-                                                   };
-static const int tSzie=3;
-static const std::map<const std::string,const int> a={{"",3}};
+
+
 int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     int base_address=pll_base_addr[pll];
-
+    int paramAddress=base_address+param_dict.at("f0")[0];
 
     if (parameter=="f0"||parameter=="bw"){
-        float val_float = std::stof(value)/31.25*pow(10,6)* pow(2,32);
+        float val_float = std::stof(value)/(31.25*pow(10,6))* pow(2,32);
         int   val_int = static_cast<int>(val_float);
-        int bitsSize =  a.at("");
+        std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" "+std::to_string(val_int);
+        std::string reply{};
+        sendCommand(valueSetCommand,reply);
 
-        //std::bitset<bitsSize> abc{1};
-        // bit  value_bitstring = self.__class__.signed_int_to_bitstring(val, n)
 
     }
     return 0;// no issues
@@ -45,11 +32,16 @@ int RPUtility::sendCommand(std::string command,std::string &serverReply){
     int rc;
     char buffer[1];
     int nbytes;
+    if (active_session==NULL){
+        emit log_message("No active connection, sending command "+command+" failed.");
+        return -1;
+    }
     ssh_channel  channel = ssh_channel_new(active_session);
     std::string receive = "";
 
     int sessionOK=ssh_channel_open_session(channel);
     if (sessionOK == SSH_ERROR){
+        emit log_message(ssh_get_error(active_session));
         return -1;
     }
 
@@ -358,8 +350,8 @@ int RPUtility::scp_copyBitfile()
 }
 
 
-void pll1_f0_ChangedListener(int value){
-    int x=4;
+void RPUtility::pll1_f0_ChangedListener(int value){
+    setParameter("f0",std::to_string(value),0);
 }
 
 

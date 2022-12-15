@@ -30,7 +30,7 @@ private slots:
 
     void on_execTestCommandBtn_clicked();
 
-    void on_pll1_f0_box_valueChanged(int arg1);
+
 
 private:
     Ui::MainWindow *ui;
