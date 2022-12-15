@@ -13,7 +13,7 @@ int pll_base_addr[2] = {0x41200000, 0x41300000};
 
 int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     int base_address=pll_base_addr[pll];
-    int paramAddress=base_address+param_dict.at("f0")[0];
+    int paramAddress=base_address+param_dict.at(parameter)[0];
 
     if (parameter=="f0"||parameter=="bw"){
         float val_float = std::stof(value)/(31.25*pow(10,6))* pow(2,32);
@@ -22,11 +22,32 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         std::string reply{};
         sendCommand(valueSetCommand,reply);
 
-
     }
     return 0;// no issues
 
 }
+
+
+
+int RPUtility::readParameter(std::string parameter,std::string &result,int pll ){
+    int base_address=pll_base_addr[pll];
+    int paramAddress=base_address+param_dict.at(parameter)[0];
+    std::string valueReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
+    std::string reply{};
+    sendCommand(valueReadCommand,reply);
+    //convert to int
+    if (parameter=="f0"||parameter=="bw"){
+        try{
+            int hexParam=  std::stoi( reply );
+            int scaledParam=hexParam/pow(2,32) *31.25*pow(10,6);
+
+        }catch(std::exception &ex){
+          emit  log_message(ex.what());
+        }
+    }
+    return 0;
+}
+
 
 int RPUtility::sendCommand(std::string command,std::string &serverReply){
     int rc;

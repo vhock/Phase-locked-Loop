@@ -121,7 +121,7 @@
    <widget class="QSpinBox" name="pll1_f0_box">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>170</x>
       <y>330</y>
       <width>71</width>
       <height>22</height>
@@ -161,12 +161,17 @@
     </property>
     <row>
      <property name="text">
-      <string>f0</string>
+      <string/>
      </property>
     </row>
     <row>
      <property name="text">
-      <string>kp</string>
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
      </property>
     </row>
     <column>
@@ -174,21 +179,39 @@
       <string>Parameter</string>
      </property>
     </column>
+    <column>
+     <property name="text">
+      <string>Value</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>Frequency</string>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="text">
+      <string>KI</string>
+     </property>
+    </item>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>170</x>
       <y>360</y>
       <width>71</width>
       <height>22</height>
      </rect>
     </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
     <property name="minimum">
      <double>-30000.000000000000000</double>
     </property>
     <property name="maximum">
-     <double>30000.000000000000000</double>
+     <double>0.000000000000000</double>
     </property>
     <property name="singleStep">
      <double>0.100000000000000</double>
