@@ -38,13 +38,15 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
     //convert to int
     if (parameter=="f0"||parameter=="bw"){
         try{
-            int hexParam=  std::stoi( reply );
+            int hexParam=  std::stoi( reply,0,16 );
             int scaledParam=hexParam/pow(2,32) *31.25*pow(10,6);
+            result=std::to_string(scaledParam);
 
         }catch(std::exception &ex){
           emit  log_message(ex.what());
         }
     }
+
     return 0;
 }
 
@@ -372,7 +374,12 @@ int RPUtility::scp_copyBitfile()
 
 
 void RPUtility::pll1_f0_ChangedListener(int value){
+    //set parameter
     setParameter("f0",std::to_string(value),0);
+    //verify the parameter has been set by reading the parameter and emitting the parameter as log message
+    std::string result{};
+    readParameter("f0",result,0);
+    emit log_message("Changed parameter f0 to :"+ result);
 }
 
 
