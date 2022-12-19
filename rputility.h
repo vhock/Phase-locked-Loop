@@ -44,7 +44,7 @@ private:
     static const std::string  TMPLOCATION;
     static const std::string RP_FILEXISTS_COMMAND;
     static const std::string  RP_EXECUTE_BITFILE_COMMAND;
-    const std::map<std::string, std::array<int,3>> param_dict{{"2nd_harm", {0, 7, 7}},
+    const std::map<std::string, std::array<int,4>> param_dict{{"2nd_harm", {0, 7, 7}},
                                                           {"pid_en",   {0, 6, 6}},
                                                           {"w_a",      {8, 15, 8}},
                                                           {"w_b",      {8, 7, 0}},
@@ -66,6 +66,7 @@ private:
     int openChannel(ssh_session session);
     void monitorActiveSession();
     int setParameter(std::string parameter,std::string value,int pll=0);
+    void checkAndHandleDataTypeRangeViolation(float &val,int nbits);
 public slots:
 void pll1_f0_ChangedListener(int value);
 
