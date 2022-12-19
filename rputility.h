@@ -34,6 +34,7 @@ public:
     int scp_copyBitfile();
     int executeBitfile();
     int readParameter(std::string parameter,std::string &result,int pll );
+    void parameterChangedListener(std::string parameter,double value);
 
 
 
@@ -57,9 +58,6 @@ private:
                                                           {"fNCO",     {0x40000,31,0}},//more a signal
                                                           {"fNCOErr",  {0x50000,31,0}}//more a signal
                                                          };
-
-
-
     const std::map<std::string, std::string>  output_options = {
                         { "PLL1", "000"               }   ,
                         { "PLL2", "001"               }   ,
@@ -70,7 +68,7 @@ private:
                         { "LI1_X", "110"              }   ,
                         { "LI2_Y", "111"              }   ,
                         };
-
+   void shiftNegativeValue(int &val,int nbits);
     ssh_session active_session=NULL;
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected

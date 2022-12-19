@@ -28,12 +28,10 @@ private slots:
 
     void on_disconnectButton_clicked();
 
-
-
-
     void on_loadBitfileButton_clicked();
 
     void on_sendArbitraryCommandBtn_clicked();
+
 
 private:
     Ui::MainWindow *ui;

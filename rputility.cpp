@@ -24,8 +24,13 @@ void RPUtility::rescaleNegativeValues(float &val,int nbits){
 
 }
 
-
-
+/* All Red Pitaya parameter values are postive, negative values are encoded by an offset relative to the maximum value
+ */
+void RPUtility::shiftNegativeValue(int &val,int nbits){
+    if (val<0){
+        val=pow(2,nbits)+val;
+    }
+}
 
 int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     int base_address=pll_base_addr[pll];
@@ -58,6 +63,7 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     if (parameter=="kp"||parameter=="ki"){
        float scaled_float = val_float* pow(2,16);
         val_int = static_cast<int>(scaled_float);
+        shiftNegativeValue(val_int,nbits);
     }
 
 
@@ -264,6 +270,7 @@ int RPUtility::connect(std::string ipAddress){
 
     active_session=rp_session; //copy construction, important because if ref to rp_session is used all other threads works with undefined memory
     emit connectionStateChanged(1);
+    connection_status=1;
     //  std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);// launch a thread which monitors the active session
     //monitorSessionThread.detach();
     return 0;
@@ -313,7 +320,6 @@ void RPUtility::monitorActiveSession(){
         ssh_channel channel;
         int rc;
         channel = ssh_channel_new(active_session);
-        ssh_channel_set_blocking(channel,true);
         if (ssh_channel_is_closed(channel)==0){
             return ;
         }
@@ -422,6 +428,10 @@ void RPUtility::pll1_f0_ChangedListener(int value){
     std::string result{};
     readParameter("f0",result,0);
     emit log_message("Changed parameter f0 to :"+ result);
+}
+
+void RPUtility::parameterChangedListener(std::string parameter,double value){
+    int x=4;
 }
 
 

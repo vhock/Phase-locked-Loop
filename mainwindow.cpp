@@ -30,9 +30,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     //connect UI parameter fields to the Red Pitaya utility
      ui->pll1_freq_box->setKeyboardTracking(false);
-     QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
+   //  QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
 
-
+     QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+         rpUtility.parameterChangedListener("test",newValue);}
+         );
+//     connect(
+//         sender, &Sender::valueChanged,
+//         [=]( const QString &newValue ) { receiver->updateValue( "senderValue", newValue ); }
+//     );
 }
 
 MainWindow::~MainWindow()
