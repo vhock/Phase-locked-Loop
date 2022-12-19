@@ -11,8 +11,8 @@ const std::string RPUtility::RP_EXECUTE_BITFILE_COMMAND="cat "+TMPLOCATION+PLL_B
 int pll_base_addr[2] = {0x41200000, 0x41300000};
 
 
-//this should cover signed/unsignedness as well
-void RPUtility::checkAndHandleDataTypeRangeViolation(float &val,int nbits){
+//this should cover signed/unsignedness as well, postponed for now
+void RPUtility::rescaleNegativeValues(float &val,int nbits){
       if (val<-pow(2,nbits-1)){
           emit log_message("Value "+std::to_string( val) +"out of maximum range"+std::to_string(-pow(2,nbits-1)));
                   val=-pow(2,nbits-1);
@@ -32,22 +32,37 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     int paramAddress=base_address+param_dict.at(parameter)[0];
     int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
     float val_float = std::stof(value);
-    checkAndHandleDataTypeRangeViolation( val_float, nbits);
 
     std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
-    int scaled_val_int{};
-    std::string scaledValue_string{};
-    //coversions
+
+    int val_int{};
+    std::string value_string{};
+
+    if (parameter=="2nd_harm"||parameter=="pid_en"){
+        val_int=std::stoi(value);
+    }
+
+    if (parameter=="output_1"||parameter=="output_2"){
+       std::string bitstring= output_options.at("value");
+       std::bitset<3> bitSeq{bitstring};
+       val_int=bitSeq.to_ullong();
+    }
+    if (parameter=="ext_pins_n"||parameter=="ext_pins_p"){
+        //TODO these do not work in the original either it seems. omitted for now
+    }
+
     if (parameter=="f0"||parameter=="bw"){
        float scaled_float = val_float/(31.25*pow(10,6))* pow(2,32);
-       checkAndHandleDataTypeRangeViolation(scaled_float,nbits);
-        scaled_val_int = static_cast<int>(scaled_float);
+        val_int = static_cast<int>(scaled_float);
+    }
+    if (parameter=="kp"||parameter=="ki"){
+       float scaled_float = val_float* pow(2,16);
+        val_int = static_cast<int>(scaled_float);
     }
 
 
-    scaledValue_string=std::to_string(scaled_val_int);
-    valueSetCommand.append(scaledValue_string );
-
+    value_string=std::to_string(val_int);
+    valueSetCommand.append(value_string );
     std::string reply{};
     sendCommand(valueSetCommand,reply);
     return 0;// no issues

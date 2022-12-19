@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->ipAddress->setText("192.168.20.188"); //TODO for debugging, delete later
 
     //connect UI parameter fields to the Red Pitaya utility
-     ui->pll1_f0_box->setKeyboardTracking(false);
-     QObject::connect(ui->pll1_f0_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
+     ui->pll1_freq_box->setKeyboardTracking(false);
+     QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
 
 
 }
@@ -105,14 +105,21 @@ void MainWindow::on_disconnectButton_clicked()
 }
 
 
-void MainWindow::on_execTestCommandBtn_clicked()
+
+
+void MainWindow::on_loadBitfileButton_clicked()
 {
-    auto command= ui->commandBox->toPlainText().toStdString();
-    std::string answer{};
-    rpUtility.sendCommand(command,answer);
     rpUtility.scp_copyBitfile();
     rpUtility.executeBitfile();
 }
 
 
+void MainWindow::on_sendArbitraryCommandBtn_clicked()
+{
+    auto command= ui->commandBox->toPlainText().toStdString();
+    std::string answer{};
+    rpUtility.sendCommand(command,answer);
+    logMessages("Command "+command+" returned: "+answer);
+
+}
 

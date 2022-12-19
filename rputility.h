@@ -58,6 +58,19 @@ private:
                                                           {"fNCOErr",  {0x50000,31,0}}//more a signal
                                                          };
 
+
+
+    const std::map<std::string, std::string>  output_options = {
+                        { "PLL1", "000"               }   ,
+                        { "PLL2", "001"               }   ,
+                        { "PLL1 + PLL2", "010"        }   ,
+                        { "PLL1 + IN2", "011"         }   ,
+                        { "IN1", "100"                }   ,
+                        { "IN2", "101"                }   ,
+                        { "LI1_X", "110"              }   ,
+                        { "LI2_Y", "111"              }   ,
+                        };
+
     ssh_session active_session=NULL;
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected
@@ -66,7 +79,7 @@ private:
     int openChannel(ssh_session session);
     void monitorActiveSession();
     int setParameter(std::string parameter,std::string value,int pll=0);
-    void checkAndHandleDataTypeRangeViolation(float &val,int nbits);
+    void rescaleNegativeValues(float &val,int nbits);
 public slots:
 void pll1_f0_ChangedListener(int value);
 
