@@ -29,16 +29,26 @@ MainWindow::MainWindow(QWidget *parent)
     ui->ipAddress->setText("192.168.20.188"); //TODO for debugging, delete later
 
     //connect UI parameter fields to the Red Pitaya utility
-     ui->pll1_freq_box->setKeyboardTracking(false);
-   //  QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
+    ui->pll1_freq_box->setKeyboardTracking(false);
+    ui->pll1_kp_box->setKeyboardTracking(false);
+    ui->pll1_ki_box->setKeyboardTracking(false);
+    QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("f0",newValue,0);}
+    );
 
-     QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-         rpUtility.parameterChangedListener("test",newValue);}
-         );
-//     connect(
-//         sender, &Sender::valueChanged,
-//         [=]( const QString &newValue ) { receiver->updateValue( "senderValue", newValue ); }
-//     );
+    QObject::connect(ui->pll1_kp_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("kp",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_ki_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("ki",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("a",newValue,0);}
+    );
+    //  QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
+
 }
 
 MainWindow::~MainWindow()
@@ -127,5 +137,14 @@ void MainWindow::on_sendArbitraryCommandBtn_clicked()
     rpUtility.sendCommand(command,answer);
     logMessages("Command "+command+" returned: "+answer);
 
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+ RPParameterConverter rpConv;
+ rpConv.setParameter(0,"pid_en",1);
+long ans= rpConv.getParameter(0,"2nd_harm");
+int x=4;
 }
 

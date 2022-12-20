@@ -18,39 +18,41 @@ find_package(libssh CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread regex date_time )
 set(CMAKE_AUTORCC ON)
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        rputility.h
-        rputility.cpp
-        resources.qrc
-        pll_project.bit
-)
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    rputility.h
+    rputility.cpp
+    rpparameterconverter.h
+    rpparameterconverter.cpp
+    resources.qrc
+    pll_project.bit
+    )
 set(RESOURCE_FILES
-  pll_project.bit
- )
+    pll_project.bit
+    )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(PLLInterface_Cpp
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-    )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET PLLInterface_Cpp APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+        )
+    # Define target properties for Android with Qt 6 as:
+    #    set_property(TARGET PLLInterface_Cpp APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+    #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+    # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(PLLInterface_Cpp SHARED
             ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+            )
+        # Define properties for Android with Qt 5 after find_package() calls as:
+        #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(PLLInterface_Cpp
             ${PROJECT_SOURCES}
-        )
+            )
     endif()
 endif()
 

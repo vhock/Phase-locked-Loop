@@ -393,6 +393,19 @@
      <string>Send Command</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>90</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Test Button</string>
+    </property>
+   </widget>
    <zorder>tableWidget</zorder>
    <zorder>ipAddress</zorder>
    <zorder>connectButton</zorder>
@@ -412,6 +425,7 @@
    <zorder>pll1_alpha_box</zorder>
    <zorder>pll1_order_box</zorder>
    <zorder>sendArbitraryCommandBtn</zorder>
+   <zorder>pushButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

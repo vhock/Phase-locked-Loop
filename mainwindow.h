@@ -6,6 +6,7 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <rputility.h>
+#include <rpparameterconverter.h>
 Q_DECLARE_METATYPE(std::string)
 //Q_DECLARE_METATYPE(int)
 
@@ -32,6 +33,8 @@ private slots:
 
     void on_sendArbitraryCommandBtn_clicked();
 
+
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -12,25 +12,36 @@ int pll_base_addr[2] = {0x41200000, 0x41300000};
 
 
 //this should cover signed/unsignedness as well, postponed for now
-void RPUtility::rescaleNegativeValues(float &val,int nbits){
-      if (val<-pow(2,nbits-1)){
-          emit log_message("Value "+std::to_string( val) +"out of maximum range"+std::to_string(-pow(2,nbits-1)));
-                  val=-pow(2,nbits-1);
-      }
-      if (val>pow(2,nbits-1)){
-          emit log_message("Value "+std::to_string( val) +"out of maximum range"+std::to_string(pow(2,nbits-1)));
-                  val=pow(2,nbits-1);
-      }
+//void RPUtility::rescaleNegativeValues(float &val,int nbits){
+//      if (val<-pow(2,nbits-1)){
+//          emit log_message("Value "+std::to_string( val) +"out of maximum range"+std::to_string(-pow(2,nbits-1)));
+//                  val=-pow(2,nbits-1);
+//      }
+//      if (val>pow(2,nbits-1)){
+//          emit log_message("Value "+std::to_string( val) +"out of maximum range"+std::to_string(pow(2,nbits-1)));
+//                  val=pow(2,nbits-1);
+//      }
 
-}
+//}
 
 /* All Red Pitaya parameter values are postive, negative values are encoded by an offset relative to the maximum value
  */
-void RPUtility::shiftNegativeValue(int &val,int nbits){
+void RPUtility::shiftNegativeValueForWriting(long &val,int nbits){
     if (val<0){
-        val=pow(2,nbits)+val;
+       int64_t maxnbitvalue= static_cast<int64_t>(std::pow(2, nbits));
+        ulong shifted=maxnbitvalue+val;
+        val=shifted;
     }
 }
+
+void RPUtility::shiftNegativeValueForReading(long &val,int nbits){
+    if (val>0){
+       int64_t maxnbitvalue= static_cast<int64_t>(std::pow(2, nbits));
+        ulong shifted=val-maxnbitvalue;
+        val=shifted;
+    }
+}
+
 
 int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     int base_address=pll_base_addr[pll];
@@ -38,19 +49,24 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
     float val_float = std::stof(value);
 
-    std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
 
-    int val_int{};
+    long val_long{};
     std::string value_string{};
 
+    if (parameter=="a"||parameter=="phi"){
+        std::string w_a{};
+        readParameter("w_a",w_a,pll);
+
+    }
+
     if (parameter=="2nd_harm"||parameter=="pid_en"){
-        val_int=std::stoi(value);
+        val_long=std::stoi(value);
     }
 
     if (parameter=="output_1"||parameter=="output_2"){
        std::string bitstring= output_options.at("value");
        std::bitset<3> bitSeq{bitstring};
-       val_int=bitSeq.to_ullong();
+       val_long=bitSeq.to_ullong();
     }
     if (parameter=="ext_pins_n"||parameter=="ext_pins_p"){
         //TODO these do not work in the original either it seems. omitted for now
@@ -58,16 +74,17 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
 
     if (parameter=="f0"||parameter=="bw"){
        float scaled_float = val_float/(31.25*pow(10,6))* pow(2,32);
-        val_int = static_cast<int>(scaled_float);
+        val_long = static_cast<long>(scaled_float);
     }
     if (parameter=="kp"||parameter=="ki"){
        float scaled_float = val_float* pow(2,16);
-        val_int = static_cast<int>(scaled_float);
-        shiftNegativeValue(val_int,nbits);
+        val_long = static_cast<long>(scaled_float);
+        shiftNegativeValueForWriting(val_long,nbits);
     }
 
+    std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
 
-    value_string=std::to_string(val_int);
+    value_string=std::to_string(val_long);
     valueSetCommand.append(value_string );
     std::string reply{};
     sendCommand(valueSetCommand,reply);
@@ -76,24 +93,40 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
 }
 
 
-
+/*Depending on the type of parameter, this method will return a int or float value as a string
+ * */
 int RPUtility::readParameter(std::string parameter,std::string &result,int pll ){
     int base_address=pll_base_addr[pll];
     int paramAddress=base_address+param_dict.at(parameter)[0];
     std::string valueReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
+    int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
     std::string reply{};
     sendCommand(valueReadCommand,reply);
+    long longFromHexReply{};
+   // long scaledReply{};
     //convert to int
+    if (parameter=="w_a"){
+        std::bitset<32> replyBitset(reply);
+        int x=4;
+
+    }
+
     if (parameter=="f0"||parameter=="bw"){
         try{
-            int hexParam=  std::stoi( reply,0,16 );
-            int scaledParam=hexParam/pow(2,32) *31.25*pow(10,6);
-            result=std::to_string(scaledParam);
-
+             longFromHexReply=std::stoul( reply,0,16 );
+          long scaledReply=longFromHexReply/pow(2,32) *31.25*pow(10,6);
+            result=std::to_string(scaledReply);
         }catch(std::exception &ex){
           emit  log_message(ex.what());
         }
     }
+    if (parameter=="kp"||parameter=="ki"){
+        longFromHexReply=  std::stoul( reply,0,16 );
+        shiftNegativeValueForReading(longFromHexReply,nbits);
+        double scaledReply=longFromHexReply/pow(2,16);
+        result=std::to_string(scaledReply);
+    }
+
 
     return 0;
 }
@@ -421,6 +454,7 @@ int RPUtility::scp_copyBitfile()
 }
 
 
+//TODO old, delete me
 void RPUtility::pll1_f0_ChangedListener(int value){
     //set parameter
     setParameter("f0",std::to_string(value),0);
@@ -430,8 +464,12 @@ void RPUtility::pll1_f0_ChangedListener(int value){
     emit log_message("Changed parameter f0 to :"+ result);
 }
 
-void RPUtility::parameterChangedListener(std::string parameter,double value){
-    int x=4;
+void RPUtility::parameterChangedListener(std::string parameter,double value,int pll){
+    setParameter(parameter,std::to_string(value),pll);
+    //verify the parameter has been set by reading the parameter and emitting the parameter as log message
+    std::string result{};
+    readParameter(parameter,result,pll);
+    emit log_message("Changed parameter "+parameter+" to:"+ result);
 }
 
 

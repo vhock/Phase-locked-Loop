@@ -34,7 +34,7 @@ public:
     int scp_copyBitfile();
     int executeBitfile();
     int readParameter(std::string parameter,std::string &result,int pll );
-    void parameterChangedListener(std::string parameter,double value);
+    void parameterChangedListener(std::string parameter,double value,int pll);
 
 
 
@@ -45,7 +45,7 @@ private:
     static const std::string  TMPLOCATION;
     static const std::string RP_FILEXISTS_COMMAND;
     static const std::string  RP_EXECUTE_BITFILE_COMMAND;
-    const std::map<std::string, std::array<int,4>> param_dict{{"2nd_harm", {0, 7, 7}},
+    const std::map<std::string, std::array<int,3>> param_dict{{"2nd_harm", {0, 7, 7}},
                                                           {"pid_en",   {0, 6, 6}},
                                                           {"w_a",      {8, 15, 8}},
                                                           {"w_b",      {8, 7, 0}},
@@ -68,7 +68,9 @@ private:
                         { "LI1_X", "110"              }   ,
                         { "LI2_Y", "111"              }   ,
                         };
-   void shiftNegativeValue(int &val,int nbits);
+
+    void shiftNegativeValueForWriting(long &val,int nbits);
+    void shiftNegativeValueForReading(long &val,int nbits);
     ssh_session active_session=NULL;
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected
@@ -77,7 +79,7 @@ private:
     int openChannel(ssh_session session);
     void monitorActiveSession();
     int setParameter(std::string parameter,std::string value,int pll=0);
-    void rescaleNegativeValues(float &val,int nbits);
+   // void rescaleNegativeValue(long &val,int nbits);
 public slots:
 void pll1_f0_ChangedListener(int value);
 
