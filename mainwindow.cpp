@@ -47,6 +47,23 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->pll1_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
         rpUtility.parameterChangedListener("a",newValue,0);}
     );
+
+    QObject::connect(ui->pll1_2nd_harm_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("2nd_harm",newValue,0);}
+    );
+    QObject::connect(ui->pll1_pid_en_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("pid_en",newValue,0);}
+    );
+
+    QObject::connect(ui->output1_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
+        rpUtility.parameterChangedListener("output_1",newValue,0);}
+    );
+
+    QObject::connect(ui->output2_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
+        rpUtility.parameterChangedListener("output_2",newValue,0);}
+    );
+
+
     //  QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
 
 }
@@ -151,6 +168,7 @@ void MainWindow::on_pushButton_clicked()
  rpConv.setParameter(0,"output_1",1);//001-pll2
  rpConv.setParameter(0,"output_2",5);//101-in2
  unsigned long ans2= rpConv.getParameterRegister(0,"2nd_harm");
+ assert(ans==233);
 
 
 

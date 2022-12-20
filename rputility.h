@@ -21,6 +21,7 @@
 #include <map>
 #include <array>
 #include <bitset>
+#include <rpparameterconverter.h>
 // std::ifstream
 class RPUtility : public QObject
 {
@@ -46,29 +47,31 @@ private:
     static const std::string RP_FILEXISTS_COMMAND;
     static const std::string  RP_EXECUTE_BITFILE_COMMAND;
     const std::map<std::string, std::array<int,3>> param_dict{{"2nd_harm", {0, 7, 7}},
-                                                          {"pid_en",   {0, 6, 6}},
-                                                          {"w_a",      {8, 15, 8}},
-                                                          {"w_b",      {8, 7, 0}},
-                                                          {"kp",       {0x10000, 31, 0}},
-                                                          {"ki",       {0x10008, 31, 0}},
-                                                          {"f0",       {0x20000, 31, 0}},
-                                                          {"bw",       {0x20008, 31, 0}},
-                                                          {"alpha",    {0x30000, 26, 10}},
-                                                          {"order",    {0x30000, 2, 0}},
-                                                          {"fNCO",     {0x40000,31,0}},//more a signal
-                                                          {"fNCOErr",  {0x50000,31,0}}//more a signal
-                                                         };
+                                                              {"pid_en",   {0, 6, 6}},
+                                                              {"w_a",      {8, 15, 8}},
+                                                              {"w_b",      {8, 7, 0}},
+                                                              {"kp",       {0x10000, 31, 0}},
+                                                              {"ki",       {0x10008, 31, 0}},
+                                                              {"f0",       {0x20000, 31, 0}},
+                                                              {"bw",       {0x20008, 31, 0}},
+                                                              {"alpha",    {0x30000, 26, 10}},
+                                                              {"order",    {0x30000, 2, 0}},
+                                                              {"fNCO",     {0x40000,31,0}},//more a signal
+                                                              {"fNCOErr",  {0x50000,31,0}},//more a signal
+                                                              {"output_1", {0, 2, 0}},
+                                                              {"output_2", {0, 5, 3}}
+                                                             };
     const std::map<std::string, std::string>  output_options = {
-                        { "PLL1", "000"               }   ,
-                        { "PLL2", "001"               }   ,
-                        { "PLL1 + PLL2", "010"        }   ,
-                        { "PLL1 + IN2", "011"         }   ,
-                        { "IN1", "100"                }   ,
-                        { "IN2", "101"                }   ,
-                        { "LI1_X", "110"              }   ,
-                        { "LI2_Y", "111"              }   ,
-                        };
-
+        { "PLL1", "000"               }   ,
+        { "PLL2", "001"               }   ,
+        { "PLL1 + PLL2", "010"        }   ,
+        { "PLL1 + IN2", "011"         }   ,
+        { "IN1", "100"                }   ,
+        { "IN2", "101"                }   ,
+        { "LI1_X", "110"              }   ,
+        { "LI2_Y", "111"              }   ,
+    };
+    RPParameterConverter converter{};
     void shiftNegativeValueForWriting(long &val,int nbits);
     void shiftNegativeValueForReading(long &val,int nbits);
     ssh_session active_session=NULL;
@@ -79,9 +82,8 @@ private:
     int openChannel(ssh_session session);
     void monitorActiveSession();
     int setParameter(std::string parameter,std::string value,int pll=0);
-   // void rescaleNegativeValue(long &val,int nbits);
+    // void rescaleNegativeValue(long &val,int nbits);
 public slots:
-void pll1_f0_ChangedListener(int value);
 
 signals:
     void log_message(std::string message);

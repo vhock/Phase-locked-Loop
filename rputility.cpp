@@ -60,13 +60,22 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     }
 
     if (parameter=="2nd_harm"||parameter=="pid_en"){
+
         val_long=std::stoi(value);
+        converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
+        unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
+        val_long=integratedValue;
+
     }
 
     if (parameter=="output_1"||parameter=="output_2"){
-       std::string bitstring= output_options.at("value");
-       std::bitset<3> bitSeq{bitstring};
-       val_long=bitSeq.to_ullong();
+//       std::string bitstring= output_options.at("value");
+//       std::bitset<3> bitSeq{bitstring};
+//       val_long=bitSeq.to_ullong();
+        val_long=std::stoul(value);
+       converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
+       unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
+       val_long=integratedValue;
     }
     if (parameter=="ext_pins_n"||parameter=="ext_pins_p"){
         //TODO these do not work in the original either it seems. omitted for now
@@ -82,9 +91,11 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         shiftNegativeValueForWriting(val_long,nbits);
     }
 
-    std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
+
+
 
     value_string=std::to_string(val_long);
+    std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
     valueSetCommand.append(value_string );
     std::string reply{};
     sendCommand(valueSetCommand,reply);
@@ -454,15 +465,15 @@ int RPUtility::scp_copyBitfile()
 }
 
 
-//TODO old, delete me
-void RPUtility::pll1_f0_ChangedListener(int value){
-    //set parameter
-    setParameter("f0",std::to_string(value),0);
-    //verify the parameter has been set by reading the parameter and emitting the parameter as log message
-    std::string result{};
-    readParameter("f0",result,0);
-    emit log_message("Changed parameter f0 to :"+ result);
-}
+////TODO old, delete me
+//void RPUtility::pll1_f0_ChangedListener(int value){
+//    //set parameter
+//    setParameter("f0",std::to_string(value),0);
+//    //verify the parameter has been set by reading the parameter and emitting the parameter as log message
+//    std::string result{};
+//    readParameter("f0",result,0);
+//    emit log_message("Changed parameter f0 to :"+ result);
+//}
 
 void RPUtility::parameterChangedListener(std::string parameter,double value,int pll){
     setParameter(parameter,std::to_string(value),pll);
