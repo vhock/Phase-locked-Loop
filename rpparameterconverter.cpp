@@ -8,12 +8,10 @@ void RPParameterConverter::setParameter(int pll,std::string parameter,int value)
       int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
       std::bitset<32> paramRepresentaion(value); //not 32 bits actually but bitset cannot be allocated at runtime, so just ommit the rest
 
-
       std::bitset<32>* registerPtr= parameterTo32BitsetMap.at(pll).at(parameter);
-      //registerPtr->set();
+
       for (int i=0;i<nbits;i++){
           registerPtr->set(lsb+i,paramRepresentaion[i]);
-        //  registerPtr[lsb+i].set(paramRepresentaion[i]);
       }
 
     }catch(std::out_of_range){
@@ -21,9 +19,26 @@ void RPParameterConverter::setParameter(int pll,std::string parameter,int value)
     }
 
 }
+/*
+ * compare the received value for reading the register storing a certain parameter with the bitset mirroring this specific register
+/***/
+bool RPParameterConverter::verifyParameterRegisterMatch(int pll,std::string parameter,unsigned long receivedValue){
+    unsigned long localRegisterValue=  getParameterRegister(pll,parameter);
+    return localRegisterValue==receivedValue;
+}
 
+unsigned long RPParameterConverter::extractParameter(int pll,std::string parameter,const unsigned long &receivedValue){
+    std::bitset<32> receivedValueAsBitset{receivedValue};
+    std::bitset<32> extractedParameterBitset{};//parameter does not have 32 bit, but std::bitset needs a fixed size
+    int  msb = param_dict.at(parameter)[1];
+    int  lsb = param_dict.at(parameter)[2];
+    int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
+    for (int i=0;i<nbits;i++){
+        extractedParameterBitset.set(i,receivedValueAsBitset[lsb+i]);
+    }
+    return extractedParameterBitset.to_ulong();
 
-
+}
 
 RPParameterConverter::RPParameterConverter()
 {

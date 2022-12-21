@@ -6,14 +6,19 @@
 #include <QDebug>
 #include <iostream>
 #include <array>
-
+/*
+ * This class integrates, for parameters which share a register with other parameters, the parameter change into the the current register. The registers of this class should
+ * depict the current state of the actual memory register on the Red Pitaya.
+ *
+ * */
 class RPParameterConverter
 {
 public:
     RPParameterConverter();
    void setParameter(int pll,std::string parameter,int value);
-  unsigned long getParameterRegister(int pll,std::string parameter);
-
+   unsigned long getParameterRegister(int pll,std::string parameter);
+   bool verifyParameterRegisterMatch(int pll,std::string parameter,unsigned long receivedValue);//compare the received value for reading the register storing a certain parameter with the bitset mirroring this specific register
+   unsigned long extractParameter(int pll,std::string parameter,const unsigned long &receivedValue);
 private:
    //initialize the pll/parameter bitstream map
    std::bitset<32> pll1_reg_1; //ext_pins_n/p ,SEL B SEL A,2nd harmonic, PID_EN,

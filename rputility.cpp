@@ -11,24 +11,12 @@ const std::string RPUtility::RP_EXECUTE_BITFILE_COMMAND="cat "+TMPLOCATION+PLL_B
 int pll_base_addr[2] = {0x41200000, 0x41300000};
 
 
-//this should cover signed/unsignedness as well, postponed for now
-//void RPUtility::rescaleNegativeValues(float &val,int nbits){
-//      if (val<-pow(2,nbits-1)){
-//          emit log_message("Value "+std::to_string( val) +"out of maximum range"+std::to_string(-pow(2,nbits-1)));
-//                  val=-pow(2,nbits-1);
-//      }
-//      if (val>pow(2,nbits-1)){
-//          emit log_message("Value "+std::to_string( val) +"out of maximum range"+std::to_string(pow(2,nbits-1)));
-//                  val=pow(2,nbits-1);
-//      }
-
-//}
 
 /* All Red Pitaya parameter values are postive, negative values are encoded by an offset relative to the maximum value
  */
 void RPUtility::shiftNegativeValueForWriting(long &val,int nbits){
     if (val<0){
-       int64_t maxnbitvalue= static_cast<int64_t>(std::pow(2, nbits));
+        int64_t maxnbitvalue= static_cast<int64_t>(std::pow(2, nbits));
         ulong shifted=maxnbitvalue+val;
         val=shifted;
     }
@@ -36,7 +24,7 @@ void RPUtility::shiftNegativeValueForWriting(long &val,int nbits){
 
 void RPUtility::shiftNegativeValueForReading(long &val,int nbits){
     if (val>0){
-       int64_t maxnbitvalue= static_cast<int64_t>(std::pow(2, nbits));
+        int64_t maxnbitvalue= static_cast<int64_t>(std::pow(2, nbits));
         ulong shifted=val-maxnbitvalue;
         val=shifted;
     }
@@ -44,62 +32,66 @@ void RPUtility::shiftNegativeValueForReading(long &val,int nbits){
 
 
 int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
-    int base_address=pll_base_addr[pll];
-    int paramAddress=base_address+param_dict.at(parameter)[0];
-    int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
-    float val_float = std::stof(value);
+    try{
+        int base_address=pll_base_addr[pll];
+        int paramAddress=base_address+param_dict.at(parameter)[0];
+        int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
+        float val_float = std::stof(value);
 
 
-    long val_long{};
-    std::string value_string{};
+        long val_long{};
+        std::string value_string{};
 
-    if (parameter=="a"||parameter=="phi"){
-        std::string w_a{};
-        readParameter("w_a",w_a,pll);
+        if (parameter=="a"||parameter=="phi"){
+            std::string w_a{};
+            readParameter("w_a",w_a,pll);
 
+        }
+
+        if (parameter=="2nd_harm"||parameter=="pid_en"){
+
+            val_long=std::stoi(value);
+            converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
+            unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
+            val_long=integratedValue;
+
+        }
+
+        if (parameter=="output_1"||parameter=="output_2"){
+            //       std::string bitstring= output_options.at("value");
+            //       std::bitset<3> bitSeq{bitstring};
+            //       val_long=bitSeq.to_ullong();
+            val_long=std::stoul(value);
+            converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
+            unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
+            val_long=integratedValue;
+        }
+        if (parameter=="ext_pins_n"||parameter=="ext_pins_p"){
+            //TODO these do not work in the original either it seems. omitted for now
+        }
+
+        if (parameter=="f0"||parameter=="bw"){
+            float scaled_float = val_float/(31.25*pow(10,6))* pow(2,32);
+            val_long = static_cast<long>(scaled_float);
+        }
+        if (parameter=="kp"||parameter=="ki"){
+            float scaled_float = val_float* pow(2,16);
+            val_long = static_cast<long>(scaled_float);
+            shiftNegativeValueForWriting(val_long,nbits);
+        }
+
+
+
+
+        value_string=std::to_string(val_long);
+        std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
+        valueSetCommand.append(value_string );
+        std::string reply{};
+        sendCommand(valueSetCommand,reply);
+        return 0;// no issues
+    }catch(std::exception &ex){
+        emit  log_message("Setting parameter "+parameter+" failed:"+ex.what());
     }
-
-    if (parameter=="2nd_harm"||parameter=="pid_en"){
-
-        val_long=std::stoi(value);
-        converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
-        unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
-        val_long=integratedValue;
-
-    }
-
-    if (parameter=="output_1"||parameter=="output_2"){
-//       std::string bitstring= output_options.at("value");
-//       std::bitset<3> bitSeq{bitstring};
-//       val_long=bitSeq.to_ullong();
-        val_long=std::stoul(value);
-       converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
-       unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
-       val_long=integratedValue;
-    }
-    if (parameter=="ext_pins_n"||parameter=="ext_pins_p"){
-        //TODO these do not work in the original either it seems. omitted for now
-    }
-
-    if (parameter=="f0"||parameter=="bw"){
-       float scaled_float = val_float/(31.25*pow(10,6))* pow(2,32);
-        val_long = static_cast<long>(scaled_float);
-    }
-    if (parameter=="kp"||parameter=="ki"){
-       float scaled_float = val_float* pow(2,16);
-        val_long = static_cast<long>(scaled_float);
-        shiftNegativeValueForWriting(val_long,nbits);
-    }
-
-
-
-
-    value_string=std::to_string(val_long);
-    std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
-    valueSetCommand.append(value_string );
-    std::string reply{};
-    sendCommand(valueSetCommand,reply);
-    return 0;// no issues
 
 }
 
@@ -107,39 +99,54 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
 /*Depending on the type of parameter, this method will return a int or float value as a string
  * */
 int RPUtility::readParameter(std::string parameter,std::string &result,int pll ){
-    int base_address=pll_base_addr[pll];
-    int paramAddress=base_address+param_dict.at(parameter)[0];
-    std::string valueReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
-    int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
-    std::string reply{};
-    sendCommand(valueReadCommand,reply);
-    long longFromHexReply{};
-   // long scaledReply{};
-    //convert to int
-    if (parameter=="w_a"){
-        std::bitset<32> replyBitset(reply);
-        int x=4;
+    try{
+        int base_address=pll_base_addr[pll];
+        int paramAddress=base_address+param_dict.at(parameter)[0];
+        std::string valueReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
+        int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
+        std::string reply{};
+        sendCommand(valueReadCommand,reply);
+        long registerValue=std::stoul( reply,0,16 );
+        unsigned long parameterValue{};
 
-    }
 
-    if (parameter=="f0"||parameter=="bw"){
-        try{
-             longFromHexReply=std::stoul( reply,0,16 );
-          long scaledReply=longFromHexReply/pow(2,32) *31.25*pow(10,6);
-            result=std::to_string(scaledReply);
-        }catch(std::exception &ex){
-          emit  log_message(ex.what());
+        if (parameter=="w_a"){
+            std::bitset<32> replyBitset(reply);
+            int x=4;
+
         }
-    }
-    if (parameter=="kp"||parameter=="ki"){
-        longFromHexReply=  std::stoul( reply,0,16 );
-        shiftNegativeValueForReading(longFromHexReply,nbits);
-        double scaledReply=longFromHexReply/pow(2,16);
-        result=std::to_string(scaledReply);
-    }
+        //these have to be extracted from a register because they do not span the entire 32 bits
+        if (parameter=="2nd_harm"||parameter=="pid_en"||"output_1"||parameter=="output_2"){
+            //perform check first
+            bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
+            if (!registerInSync){
+                emit log_message("Client-host register mismatch for address"+ std::to_string(paramAddress));
+                return -1;
+            }
+            parameterValue=  converter.extractParameter(pll,parameter,registerValue);
+            result=std::to_string(parameterValue);
+        }
 
 
-    return 0;
+
+        if (parameter=="f0"||parameter=="bw"){
+            long scaledReply=registerValue/pow(2,32) *31.25*pow(10,6);
+            result=std::to_string(scaledReply);
+
+        }
+        if (parameter=="kp"||parameter=="ki"){
+            shiftNegativeValueForReading(registerValue,nbits);
+            double scaledReply=registerValue/pow(2,16);
+            result=std::to_string(scaledReply);
+        }
+
+
+
+        return 0;
+    }
+    catch(std::exception &ex){
+        emit  log_message("Reading parameter "+parameter+" failed:"+ex.what());
+    }
 }
 
 
