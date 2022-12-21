@@ -19,9 +19,14 @@ void RPParameterConverter::setParameter(int pll,std::string parameter,int value)
     }
 
 }
-/*
- * compare the received value for reading the register storing a certain parameter with the bitset mirroring this specific register
-/***/
+/**
+ * @brief RPParameterConverter::verifyParameterRegisterMatch
+ *   compare the received value for reading the register storing a certain parameter with the bitset mirroring this specific register
+ * @param pll
+ * @param parameter
+ * @param receivedValue
+ * @return true if registers match, false otherwise
+ */
 bool RPParameterConverter::verifyParameterRegisterMatch(int pll,std::string parameter,unsigned long receivedValue){
     unsigned long localRegisterValue=  getParameterRegister(pll,parameter);
     return localRegisterValue==receivedValue;
@@ -58,10 +63,6 @@ RPParameterConverter::RPParameterConverter()
            {"alpha",(&pll1_reg_3)},
            {"order",(&pll1_reg_3)},
 
-
-
-
-
        };
 
        std::map<std::string,std::bitset<32>*> pll2map{
@@ -85,10 +86,14 @@ RPParameterConverter::RPParameterConverter()
 
 
 }
-
+/**
+ * @brief RPParameterConverter::getParameterRegister Get the register which stores a certain parameter
+ * @param pll
+ * @param parameter
+ * @return the register containing the parameter converted from a 32-bitset to an unsigned long value
+ */
 unsigned long RPParameterConverter::getParameterRegister(int pll,std::string parameter){
-    auto shr_ptrpiden=parameterTo32BitsetMap.at(pll).at("pid_en");
-    auto shr_ptrp2nd=parameterTo32BitsetMap.at(pll).at("2nd_harm");
+
    std::string bitsetval= parameterTo32BitsetMap.at(pll).at(parameter)->to_string();
     qDebug()<<"Bitset:"<<qPrintable(QString::fromStdString(bitsetval));
      return  parameterTo32BitsetMap.at(pll).at(parameter)->to_ulong();

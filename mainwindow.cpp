@@ -32,6 +32,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pll1_freq_box->setKeyboardTracking(false);
     ui->pll1_kp_box->setKeyboardTracking(false);
     ui->pll1_ki_box->setKeyboardTracking(false);
+    ui->pll1_alpha_box->setKeyboardTracking(false);
+    ui->pll1_amplitude_box->setKeyboardTracking(false);
+    ui->pll1_phase_box->setKeyboardTracking(false);
+    ui->pll1_order_box->setKeyboardTracking(false);
+    ui->pll1_bandwith_box->setKeyboardTracking(false);
+
+
+    //set keyboard tracking to false for all spinboxes, does not work unfortunately
+//   QList<QSpinBox> spinBoxlist= this->findChildren<QSpinBox>();
+//    QList<QSpinBox>::iterator i;
+//   for (i = spinBoxlist.begin(); i != spinBoxlist.end(); ++i){
+//        (*i).setKeyboardTracking(false);
+//   }
+
+
+//    for (iter = spinBoxlist.begin(); iter != spinBoxlist.end(); ++iter){
+//        //iter->setKeyboardTracking(false);
+//}
     QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
         rpUtility.parameterChangedListener("f0",newValue,0);}
     );
@@ -48,6 +66,10 @@ MainWindow::MainWindow(QWidget *parent)
         rpUtility.parameterChangedListener("a",newValue,0);}
     );
 
+    QObject::connect(ui->pll1_phase_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("phi",newValue,0);}
+    );
+
     QObject::connect(ui->pll1_2nd_harm_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
         rpUtility.parameterChangedListener("2nd_harm",newValue,0);}
     );
@@ -61,6 +83,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(ui->output2_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
         rpUtility.parameterChangedListener("output_2",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_alpha_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("alpha",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_order_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("order",newValue,0);}
     );
 
 

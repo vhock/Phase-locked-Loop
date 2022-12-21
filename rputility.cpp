@@ -39,32 +39,41 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         float val_float = std::stof(value);
 
 
+
         long val_long{};
         std::string value_string{};
 
-        if (parameter=="a"||parameter=="phi"){
+        if (parameter=="a"||parameter=="phi"){ //TODO this has huge rounding errors, is there a better way to do it?
             std::string w_a{};
+            std::string w_b{};
             readParameter("w_a",w_a,pll);
+            readParameter("w_b",w_b,pll);
+            double a= sqrt(pow(std::stoul(w_a),2)+pow(std::stoul(w_b),2)); //current amplitude
+            double phi=atan2(std::stoul(w_a),std::stoul(w_b));//current phase
+            if (parameter=="a"){
+                a=std::stoul(value);//a gets a new value
+            }else if (parameter=="phi"){
+                phi=std::stoul(value)/360*2*M_PI; //phi gets a new value
+            }
+            unsigned long w_a_long=a*sin(phi);
+            unsigned long w_b_long=a*cos(phi);
+            setParameter("w_a",std::to_string(w_a_long),pll);
+            setParameter("w_b",std::to_string(w_b_long),pll);
+            return 0;
 
+
+        }
+
+        if (parameter=="w_a"||parameter=="w_b"){
+            val_long=std::stoul(value);
         }
 
         if (parameter=="2nd_harm"||parameter=="pid_en"){
-
-            val_long=std::stoi(value);
-            converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
-            unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
-            val_long=integratedValue;
-
+            val_long=std::stoul(value);
         }
 
         if (parameter=="output_1"||parameter=="output_2"){
-            //       std::string bitstring= output_options.at("value");
-            //       std::bitset<3> bitSeq{bitstring};
-            //       val_long=bitSeq.to_ullong();
             val_long=std::stoul(value);
-            converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
-            unsigned long integratedValue=converter.getParameterRegister(pll,parameter);
-            val_long=integratedValue;
         }
         if (parameter=="ext_pins_n"||parameter=="ext_pins_p"){
             //TODO these do not work in the original either it seems. omitted for now
@@ -72,12 +81,33 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
 
         if (parameter=="f0"||parameter=="bw"){
             float scaled_float = val_float/(31.25*pow(10,6))* pow(2,32);
-            val_long = static_cast<long>(scaled_float);
+            val_long = static_cast<unsigned long>(scaled_float);
         }
         if (parameter=="kp"||parameter=="ki"){
             float scaled_float = val_float* pow(2,16);
-            val_long = static_cast<long>(scaled_float);
+            val_long = static_cast<unsigned long>(scaled_float);
             shiftNegativeValueForWriting(val_long,nbits);
+        }
+
+        if (parameter=="alpha"){
+            float scaled_float = val_float* pow(2,17);
+            val_long = static_cast<unsigned long>(scaled_float);
+        }
+
+        if (parameter=="order"){
+            val_long=static_cast<unsigned long>(val_float)-1;
+
+        }
+
+
+
+        //integration into registers for certain parameters
+        if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
+                ||parameter=="output_2"||parameter=="2nd_harm"
+                ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
+            converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
+            unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
+            val_long=integratedValue;
         }
 
 
@@ -102,21 +132,23 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
     try{
         int base_address=pll_base_addr[pll];
         int paramAddress=base_address+param_dict.at(parameter)[0];
-        std::string valueReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
+        std::string registerReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
         int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
         std::string reply{};
-        sendCommand(valueReadCommand,reply);
+        sendCommand(registerReadCommand,reply);
         long registerValue=std::stoul( reply,0,16 );
         unsigned long parameterValue{};
 
-
-        if (parameter=="w_a"){
-            std::bitset<32> replyBitset(reply);
-            int x=4;
-
+        if (parameter=="a"){
+            unsigned long w_a= converter.extractParameter(pll,"w_a",registerValue);
+            unsigned long w_b= converter.extractParameter(pll,"w_a",registerValue);
+             unsigned long a= sqrt(pow(w_a,2)+pow(w_b,2));
+             result=std::to_string(a);
         }
+
+
         //these have to be extracted from a register because they do not span the entire 32 bits
-        if (parameter=="2nd_harm"||parameter=="pid_en"||"output_1"||parameter=="output_2"){
+        if (parameter=="2nd_harm"||parameter=="pid_en"||"output_1"||parameter=="output_2"||parameter=="w_a"||parameter=="w_b"){
             //perform check first
             bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
             if (!registerInSync){
@@ -125,9 +157,8 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
             }
             parameterValue=  converter.extractParameter(pll,parameter,registerValue);
             result=std::to_string(parameterValue);
+
         }
-
-
 
         if (parameter=="f0"||parameter=="bw"){
             long scaledReply=registerValue/pow(2,32) *31.25*pow(10,6);

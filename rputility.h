@@ -21,6 +21,12 @@
 #include <map>
 #include <array>
 #include <bitset>
+#include <cmath>
+
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 #include <rpparameterconverter.h>
 // std::ifstream
 class RPUtility : public QObject
@@ -50,6 +56,8 @@ private:
                                                               {"pid_en",   {0, 6, 6}},
                                                               {"w_a",      {8, 15, 8}},
                                                               {"w_b",      {8, 7, 0}},
+                                                              {"a",        {8, 0, 0}},// virtual parameter
+                                                              {"phi",      {8, 0, 0}},//virtual parameter
                                                               {"kp",       {0x10000, 31, 0}},
                                                               {"ki",       {0x10008, 31, 0}},
                                                               {"f0",       {0x20000, 31, 0}},

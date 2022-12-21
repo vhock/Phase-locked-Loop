@@ -365,22 +365,6 @@
      <number>429496729</number>
     </property>
    </widget>
-   <widget class="QSpinBox" name="pll1_alpha_box">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>490</y>
-      <width>71</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="suffix">
-     <string/>
-    </property>
-    <property name="maximum">
-     <number>429496729</number>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="pll1_order_box">
     <property name="geometry">
      <rect>
@@ -592,6 +576,19 @@
      </property>
     </item>
    </widget>
+   <widget class="QDoubleSpinBox" name="pll1_alpha_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>490</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>1.000000000000000</double>
+    </property>
+   </widget>
    <zorder>tableWidget</zorder>
    <zorder>ipAddress</zorder>
    <zorder>connectButton</zorder>
@@ -608,7 +605,6 @@
    <zorder>pll1_phase_box</zorder>
    <zorder>pll1_amplitude_box</zorder>
    <zorder>pll1_bandwith_box</zorder>
-   <zorder>pll1_alpha_box</zorder>
    <zorder>pll1_order_box</zorder>
    <zorder>sendArbitraryCommandBtn</zorder>
    <zorder>pushButton</zorder>
@@ -617,6 +613,7 @@
    <zorder>tableWidget_2</zorder>
    <zorder>output1_combobox</zorder>
    <zorder>output2_combobox</zorder>
+   <zorder>pll1_alpha_box</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
