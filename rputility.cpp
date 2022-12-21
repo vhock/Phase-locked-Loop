@@ -42,7 +42,7 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
 
         long val_long{};
         std::string value_string{};
-
+        //encode the parameters a and phi into weights w_a and w_b. Set these values.
         if (parameter=="a"||parameter=="phi"){ //TODO this has huge rounding errors, is there a better way to do it?
             std::string w_a{};
             std::string w_b{};
@@ -105,7 +105,7 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
                 ||parameter=="output_2"||parameter=="2nd_harm"
                 ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
-            converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with others parameters
+            converter.setParameter(pll,parameter,val_long); //integrate the parameter into register because it is shared with other parameters
             unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
             val_long=integratedValue;
         }
@@ -141,20 +141,28 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
 
         if (parameter=="a"){
             unsigned long w_a= converter.extractParameter(pll,"w_a",registerValue);
-            unsigned long w_b= converter.extractParameter(pll,"w_a",registerValue);
-             unsigned long a= sqrt(pow(w_a,2)+pow(w_b,2));
-             result=std::to_string(a);
+            unsigned long w_b= converter.extractParameter(pll,"w_b",registerValue);
+            unsigned long a= sqrt(pow(w_a,2)+pow(w_b,2));
+            result=std::to_string(a);
+            return 0;
+        }
+        if (parameter=="phi"){
+            unsigned long w_a= converter.extractParameter(pll,"w_a",registerValue);
+            unsigned long w_b= converter.extractParameter(pll,"w_b",registerValue);
+            unsigned long phi= atan2(w_a,w_b)/(2*M_PI)*360;
+            result=std::to_string(phi);
+            return 0;
         }
 
 
         //these have to be extracted from a register because they do not span the entire 32 bits
         if (parameter=="2nd_harm"||parameter=="pid_en"||"output_1"||parameter=="output_2"||parameter=="w_a"||parameter=="w_b"){
             //perform check first
-            bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
-            if (!registerInSync){
-                emit log_message("Client-host register mismatch for address"+ std::to_string(paramAddress));
-                return -1;
-            }
+//            bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
+//            if (!registerInSync){
+//                emit log_message("Client-host register mismatch for address"+ std::to_string(paramAddress));
+//                return -1;
+//            } //TODO reactivate
             parameterValue=  converter.extractParameter(pll,parameter,registerValue);
             result=std::to_string(parameterValue);
 
