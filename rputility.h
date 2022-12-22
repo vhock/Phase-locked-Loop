@@ -22,6 +22,8 @@
 #include <array>
 #include <bitset>
 #include <cmath>
+#include <QDebug>
+
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -37,12 +39,14 @@ public:
     static bool isValidIPAddress(std::string ipAddress);
     int connect(std::string ipAddress);
     int disconnect();
+    int synchronizeParameters();
     int sendCommand(std::string command,std::string &serverReply);
     int scp_copyBitfile();
     int executeBitfile();
     template <typename T> T readParameterAsNumber(std::string parameter,int pll );
 
     int readParameter(std::string parameter,std::string &result,int pll );
+   unsigned long readRegisterValueOfParameter(std::string parameter,int pll);
     void parameterChangedListener(std::string parameter,double value,int pll);
 
 
@@ -82,8 +86,8 @@ private:
         { "LI2_Y", "111"              }   ,
     };
     RPParameterConverter converter{};
-    void shiftNegativeValueForWriting(long &val,int nbits);
-    void shiftNegativeValueForReading(long &val,int nbits);
+    ulong shiftNegativeValueForWriting(long &val,int nbits);
+    long shiftNegativeValueForReading( ulong &val,int nbits);
     ssh_session active_session=NULL;
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected

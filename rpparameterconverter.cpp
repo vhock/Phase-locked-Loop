@@ -1,7 +1,7 @@
 #include "rpparameterconverter.h"
 
 
-void RPParameterConverter::setParameter(int pll,std::string parameter,int value){
+void RPParameterConverter::setParameter(int pll,std::string parameter,unsigned long value){
     try{
       int  msb = param_dict.at(parameter)[1];
       int  lsb = param_dict.at(parameter)[2];

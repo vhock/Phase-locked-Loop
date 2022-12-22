@@ -16,7 +16,7 @@ class RPParameterConverter
     friend class RPUtility;
 public:
     RPParameterConverter();
-   void setParameter(int pll,std::string parameter,int value);
+   void setParameter(int pll,std::string parameter,unsigned long value);
    unsigned long getParameterRegister(int pll,std::string parameter);
    bool verifyParameterRegisterMatch(int pll,std::string parameter,unsigned long receivedValue);//compare the received value for reading the register storing a certain parameter with the bitset mirroring this specific register
    unsigned long extractParameter(int pll,std::string parameter,const unsigned long &receivedValue);

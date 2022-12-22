@@ -206,15 +206,16 @@ void MainWindow::on_sendArbitraryCommandBtn_clicked()
 void MainWindow::on_pushButton_clicked()
 {
     //tests
- RPParameterConverter rpConv;
- rpConv.setParameter(0,"2nd_harm",1);
- rpConv.setParameter(0,"pid_en",1);
- unsigned long ans= rpConv.getParameterRegister(0,"2nd_harm");
- assert(ans==192);
- rpConv.setParameter(0,"output_1",1);//001-pll2
- rpConv.setParameter(0,"output_2",5);//101-in2
- unsigned long ans2= rpConv.getParameterRegister(0,"2nd_harm");
- assert(ans==233);
+// RPParameterConverter rpConv;
+// rpConv.setParameter(0,"2nd_harm",1);
+// rpConv.setParameter(0,"pid_en",1);
+// unsigned long ans= rpConv.getParameterRegister(0,"2nd_harm");
+// assert(ans==192);
+// rpConv.setParameter(0,"output_1",1);//001-pll2
+// rpConv.setParameter(0,"output_2",5);//101-in2
+// unsigned long ans2= rpConv.getParameterRegister(0,"2nd_harm");
+// assert(ans==233);
+    rpUtility.synchronizeParameters();
 
 
 
