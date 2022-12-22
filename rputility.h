@@ -96,6 +96,7 @@ private:
     int openChannel(ssh_session session);
     void monitorActiveSession();
     int setParameter(std::string parameter,std::string value,int pll=0);
+    void logParameterChange(std::string parameter,int pll);
     // void rescaleNegativeValue(long &val,int nbits);
 public slots:
 

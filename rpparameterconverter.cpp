@@ -95,6 +95,6 @@ RPParameterConverter::RPParameterConverter()
 unsigned long RPParameterConverter::getParameterRegister(int pll,std::string parameter){
 
    std::string bitsetval= parameterTo32BitsetMap.at(pll).at(parameter)->to_string();
-    qDebug()<<"Bitset:"<<qPrintable(QString::fromStdString(bitsetval));
+ //   qDebug()<<"Bitset:"<<qPrintable(QString::fromStdString(bitsetval)); very useful but slow
      return  parameterTo32BitsetMap.at(pll).at(parameter)->to_ulong();
 }

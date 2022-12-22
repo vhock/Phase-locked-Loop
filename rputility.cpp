@@ -315,6 +315,13 @@ int RPUtility::sendCommand(std::string command,std::string &serverReply){
     return SSH_OK;
 }
 
+void RPUtility::logParameterChange(std::string parameter,int pll){
+    std::string result{};
+
+    readParameter(parameter,result,pll);
+    emit log_message("Changed parameter "+parameter+" to:"+ result);
+}
+
 bool RPUtility::isValidIPAddress(std::string ipAddress){
     boost::system::error_code ec;
     boost::asio::ip::address::from_string( ipAddress, ec );
@@ -597,9 +604,9 @@ int RPUtility::scp_copyBitfile()
 void RPUtility::parameterChangedListener(std::string parameter,double value,int pll){
     setParameter(parameter,std::to_string(value),pll);
     //verify the parameter has been set by reading the parameter and emitting the parameter as log message
-    std::string result{};
-    readParameter(parameter,result,pll);
-    emit log_message("Changed parameter "+parameter+" to:"+ result);
+    std::thread logChange(&RPUtility::logParameterChange,this,parameter,pll);
+    logChange.detach();
+
 }
 
 
