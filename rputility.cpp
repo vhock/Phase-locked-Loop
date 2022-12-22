@@ -50,10 +50,10 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
             readParameter("w_b",w_b,pll);
             double a= sqrt(pow(std::stoul(w_a),2)+pow(std::stoul(w_b),2)); //current amplitude
             double phi=atan2(std::stoul(w_a),std::stoul(w_b));//current phase
-            if (parameter=="a"){
-                a=std::stoul(value);//a gets a new value
-            }else if (parameter=="phi"){
-                phi=std::stoul(value)/360*2*M_PI; //phi gets a new value
+            if (parameter=="a"){//a gets a new value
+                a=std::stoul(value);
+            }else if (parameter=="phi"){ //phi gets a new value
+                phi=std::stod(value)/360*2*M_PI;
             }
             unsigned long w_a_long=a*sin(phi);
             unsigned long w_b_long=a*cos(phi);
@@ -82,6 +82,8 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         if (parameter=="f0"||parameter=="bw"){
             float scaled_float = val_float/(31.25*pow(10,6))* pow(2,32);
             val_long = static_cast<unsigned long>(scaled_float);
+            int secondHarmOn=readParameterAsNumber<int>("2nd_harm",pll);
+            val_long=val_long*(1+secondHarmOn);
         }
         if (parameter=="kp"||parameter=="ki"){
             float scaled_float = val_float* pow(2,16);
@@ -124,7 +126,17 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
     }
 
 }
-
+template <typename T>
+T RPUtility::readParameterAsNumber(std::string parameter,int pll ){
+    std::string parameterValueAsString{};
+    readParameter(parameter,parameterValueAsString,pll);
+    double valAsDouble=  std::stod(parameterValueAsString);//this should hopefully be safe
+    try{
+    return (T)valAsDouble; //cast to whatever value is wanted
+    }catch(_exception &ex){
+        log_message("Casting number failed");
+    }
+}
 
 /*Depending on the type of parameter, this method will return a int or float value as a string
  * */
@@ -135,9 +147,11 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
         std::string registerReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
         int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
         std::string reply{};
-        sendCommand(registerReadCommand,reply);
+        sendCommand(registerReadCommand,reply); //read register value at the address of the parameter
         long registerValue=std::stoul( reply,0,16 );
         unsigned long parameterValue{};
+
+
 
         if (parameter=="a"){
             unsigned long w_a= converter.extractParameter(pll,"w_a",registerValue);
@@ -155,8 +169,27 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
         }
 
 
+        if (parameter=="f0"||parameter=="bw"){
+            long scaledReply=registerValue/pow(2,32) *31.25*pow(10,6);
+            int secondHarmOn=readParameterAsNumber<int>("2nd_harm",pll);
+            long scaledFor2ndHarmonic=scaledReply/(1+secondHarmOn);
+            result=std::to_string(scaledFor2ndHarmonic);
+            return 0;
+
+        }
+        if (parameter=="kp"||parameter=="ki"){
+            shiftNegativeValueForReading(registerValue,nbits);
+            double scaledReply=registerValue/pow(2,16);
+            result=std::to_string(scaledReply);
+            return 0;
+
+        }
+
+
         //these have to be extracted from a register because they do not span the entire 32 bits
-        if (parameter=="2nd_harm"||parameter=="pid_en"||"output_1"||parameter=="output_2"||parameter=="w_a"||parameter=="w_b"){
+      if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
+                        ||parameter=="output_2"||parameter=="2nd_harm"
+                        ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
             //perform check first
 //            bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
 //            if (!registerInSync){
@@ -168,16 +201,23 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
 
         }
 
-        if (parameter=="f0"||parameter=="bw"){
-            long scaledReply=registerValue/pow(2,32) *31.25*pow(10,6);
-            result=std::to_string(scaledReply);
+        if (parameter=="alpha"){
+            double scaled_double = parameterValue/ pow(2,17);
+            result=std::to_string(scaled_double);
+            return 0;
+
 
         }
-        if (parameter=="kp"||parameter=="ki"){
-            shiftNegativeValueForReading(registerValue,nbits);
-            double scaledReply=registerValue/pow(2,16);
-            result=std::to_string(scaledReply);
+
+        if (parameter=="order"){
+           int val_int=static_cast<unsigned long>(parameterValue)+1;
+           result=std::to_string(val_int);
+           return 0;
+
+
+
         }
+
 
 
 
@@ -185,6 +225,7 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
     }
     catch(std::exception &ex){
         emit  log_message("Reading parameter "+parameter+" failed:"+ex.what());
+        return -1;
     }
 }
 

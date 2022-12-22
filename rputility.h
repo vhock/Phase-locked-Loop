@@ -40,6 +40,8 @@ public:
     int sendCommand(std::string command,std::string &serverReply);
     int scp_copyBitfile();
     int executeBitfile();
+    template <typename T> T readParameterAsNumber(std::string parameter,int pll );
+
     int readParameter(std::string parameter,std::string &result,int pll );
     void parameterChangedListener(std::string parameter,double value,int pll);
 

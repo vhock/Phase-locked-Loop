@@ -13,6 +13,7 @@
  * */
 class RPParameterConverter
 {
+    friend class RPUtility;
 public:
     RPParameterConverter();
    void setParameter(int pll,std::string parameter,int value);
