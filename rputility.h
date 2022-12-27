@@ -37,7 +37,7 @@ class RPUtility : public QObject
 public:
     RPUtility();
     static bool isValidIPAddress(std::string ipAddress);
-    int connect(std::string ipAddress);
+    int connect(std::string ipAddress,std::string user,std::string password);
     int disconnect();
     int synchronizeParameters();
     int sendCommand(std::string command,std::string &serverReply);

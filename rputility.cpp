@@ -412,7 +412,7 @@ int RPUtility::verify_knownhost()
 }
 
 
-int RPUtility::connect(std::string ipAddress){
+int RPUtility::connect(std::string ipAddress,std::string user,std::string password){
     emit log_message("Establishing connection to "+ipAddress);
     ssh_session rp_session = ssh_new();
     if (rp_session == NULL) {
@@ -439,7 +439,7 @@ int RPUtility::connect(std::string ipAddress){
     //  }
 
     //Authentication
-    int auth=ssh_userauth_password(rp_session,"root","root");
+    int auth=ssh_userauth_password(rp_session,user.c_str(),password.c_str());
     if (auth != SSH_AUTH_SUCCESS)
     {
         emit log_message("Authentication failed:"+std::string(ssh_get_error(rp_session)));

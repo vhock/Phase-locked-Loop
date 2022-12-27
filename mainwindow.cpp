@@ -73,13 +73,15 @@ MainWindow::~MainWindow()
 void MainWindow::on_connectButton_clicked()
 {
     std::string ipAddressText= ui->ipAddress->toPlainText().toStdString();
+    std::string userText=ui->connect_user_box->toPlainText().toStdString();
+    std::string passwordText=ui->connect_password_box->toPlainText().toStdString();
     bool isValidIP=RPUtility::isValidIPAddress(ipAddressText);
     if (!isValidIP){
         logMessages("Invalid IP");
         return;
     }else {
         logMessages("Valid IP");
-        std::thread connectionThread(&RPUtility::connect,&rpUtility,ipAddressText);
+        std::thread connectionThread(&RPUtility::connect,&rpUtility,ipAddressText,userText,passwordText);
         connectionThread.detach();  
 
     }
