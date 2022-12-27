@@ -44,12 +44,13 @@ public:
     int scp_copyBitfile();
     int executeBitfile();
     template <typename T> T readParameterAsNumber(std::string parameter,int pll );
+    void monitorActiveSession();
 
     int readParameter(std::string parameter,std::string &result,int pll );
    unsigned long readRegisterValueOfParameter(std::string parameter,int pll);
     void parameterChangedListener(std::string parameter,double value,int pll);
    bool logParameterChanges=false;//TODO should be private with getters/setters
-
+  void startMonitorActiveSession();
 
 private:
     static const std::string XDEVCFG_DIR;
@@ -93,7 +94,6 @@ private:
     int connection_status=0; //0 disconnected, 1 connected
     int verify_knownhost();
     int openChannel(ssh_session session);
-    void monitorActiveSession();
     int setParameter(std::string parameter,std::string value,int pll=0);
     void logParameterChange(std::string parameter,int pll);
     // void rescaleNegativeValue(long &val,int nbits);

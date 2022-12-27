@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     //red pitaya listens to parameter changes sent by UI
 
 
+    QObject::connect(&rpUtility,&RPUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
 
 
     // UI listens to up-to-date parameter values sent by RP upon initial connection
@@ -162,9 +163,8 @@ void  MainWindow::connectionStateChangedListener(int code){
         ui->disconnectButton->setEnabled(true);
         ui->connectButton->setEnabled(false);
 
-        QObject::connect(&rpUtility,&RPUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
         rpUtility.synchronizeParameters();
-
+        rpUtility.startMonitorActiveSession();
         connectParameterInterface();
 
 
