@@ -37,6 +37,9 @@ long RPUtility::shiftNegativeValueForReading(ulong &val,int nbits){
 }
 
 int RPUtility::synchronizeParameters(){
+
+
+
     for (int pll=0;pll<2;pll++){
         for (auto const& elem : param_dict)
         {
@@ -48,47 +51,47 @@ int RPUtility::synchronizeParameters(){
             int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
             float val_float = std::stof(value);
             long val_long{};
-               ulong val_ulong{};
-               std::string value_string{};
+            ulong val_ulong{};
+            std::string value_string{};
 
 
-               if (parameter=="w_a"||parameter=="w_b"){
-                   val_long=std::stol(value);
-                   val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
-               }
+            if (parameter=="w_a"||parameter=="w_b"){
+                val_long=std::stol(value);
+                val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
+            }
 
-               if (parameter=="2nd_harm"||parameter=="pid_en"){
-                   val_ulong=std::stoul(value);
-               }
+            if (parameter=="2nd_harm"||parameter=="pid_en"){
+                val_ulong=std::stoul(value);
+            }
 
-               if (parameter=="output_1"||parameter=="output_2"){
-                   val_ulong=std::stoul(value);
-               }
-
-
-
-               if (parameter=="alpha"){
-                   float scaled_float = val_float* pow(2,17);
-                   val_ulong = static_cast<unsigned long>(scaled_float);
-               }
-
-               if (parameter=="order"){
-                   val_ulong=static_cast<unsigned long>(val_float)-1;
-
-               }
+            if (parameter=="output_1"||parameter=="output_2"){
+                val_ulong=std::stoul(value);
+            }
 
 
 
-               //integration into registers for certain parameters
-               if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
-                       ||parameter=="output_2"||parameter=="2nd_harm"
-                       ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
-                   converter.setParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
-                   unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
-                   val_ulong=integratedValue;
-               }
+            if (parameter=="alpha"){
+                float scaled_float = val_float* pow(2,17);
+                val_ulong = static_cast<unsigned long>(scaled_float);
+            }
 
-           qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
+            if (parameter=="order"){
+                val_ulong=static_cast<unsigned long>(val_float)-1;
+
+            }
+
+
+
+            //integration into registers for certain parameters
+            if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
+                    ||parameter=="output_2"||parameter=="2nd_harm"
+                    ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
+                converter.setParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
+                unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
+                val_ulong=integratedValue;
+            }
+
+            qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
             emit parameterInitialValue(parameter,std::stod(value),pll);
 
 
@@ -501,7 +504,7 @@ int RPUtility::connect(std::string ipAddress,std::string user,std::string passwo
     emit connectionStateChanged(1);
     connection_status=1;
     //std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);// launch a thread which monitors the active session
-   // monitorSessionThread.detach();
+    // monitorSessionThread.detach();
     return 0;
 }
 

@@ -102,7 +102,7 @@ public slots:
 signals:
     void log_message(std::string message);
     void connectionStateChanged(int code);
-    void parameterInitialValue(std::string parameter,double value,int pll);//used only once when the connection to the RP is made
+    void parameterInitialValue(std::string parameter,double value,int pll);// only once when the connection to the RP is made
 
 };
 
