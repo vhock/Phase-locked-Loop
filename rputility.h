@@ -71,8 +71,8 @@ private:
                                                               {"bw",       {0x20008, 31, 0}},
                                                               {"alpha",    {0x30000, 26, 10}},
                                                               {"order",    {0x30000, 2, 0}},
-                                                              {"fNCO",     {0x40000,31,0}},//more a signal
-                                                              {"fNCOErr",  {0x50000,31,0}},//more a signal
+                                                  //            {"fNCO",     {0x40000,31,0}},//more a signal, ommitted for now
+                                                   //           {"fNCOErr",  {0x50000,31,0}},//more a signal, ommitted for now
                                                               {"output_1", {0, 2, 0}},
                                                               {"output_2", {0, 5, 3}}
                                                              };

@@ -162,8 +162,8 @@ void  MainWindow::connectionStateChangedListener(int code){
         connectionIndicatorScene->addText("Online");
         ui->disconnectButton->setEnabled(true);
         ui->connectButton->setEnabled(false);
-
         rpUtility.synchronizeParameters();
+
         rpUtility.startMonitorActiveSession();
         connectParameterInterface();
 

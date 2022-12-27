@@ -38,7 +38,6 @@ long RPUtility::shiftNegativeValueForReading(ulong &val,int nbits){
 
 int RPUtility::synchronizeParameters(){
 
-    emit log_message("Updating parameters..");
 
     for (int pll=0;pll<2;pll++){
         for (auto const& elem : param_dict)
@@ -101,7 +100,7 @@ int RPUtility::synchronizeParameters(){
         }
 
     }
-
+    emit log_message("All parameters updated.");
     return 0;
 }
 
@@ -504,7 +503,6 @@ int RPUtility::connect(std::string ipAddress,std::string user,std::string passwo
     }
 
     active_session=rp_session; //copy construction, important because if ref to rp_session is used all other threads works with undefined memory
-
 
     emit connectionStateChanged(1);
     connection_status=1;
