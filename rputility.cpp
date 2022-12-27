@@ -10,7 +10,10 @@ const std::string RPUtility::RP_EXECUTE_BITFILE_COMMAND="cat "+TMPLOCATION+PLL_B
 
 int pll_base_addr[2] = {0x41200000, 0x41300000};
 
-
+RPUtility::RPUtility()
+{
+ emit connectionStateChanged(0);
+}
 
 /* All Red Pitaya parameter values are postive, negative values are encoded by an offset relative to the maximum value
  */
@@ -142,6 +145,7 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         std::string valueSetCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress)+" ";
         valueSetCommand.append(value_string );
         std::string reply{};
+
         sendCommand(valueSetCommand,reply);
         return 0;// no issues
     }catch(std::exception &ex){
@@ -279,6 +283,7 @@ int RPUtility::sendCommand(std::string command,std::string &serverReply){
         return -1;
     }
     ssh_channel  channel = ssh_channel_new(active_session);
+    ssh_channel_set_blocking(channel,1); //important for the ssh channel actually to actually wait for the reply
     std::string receive = "";
 
     int sessionOK=ssh_channel_open_session(channel);
@@ -610,6 +615,8 @@ void RPUtility::parameterChangedListener(std::string parameter,double value,int 
 }
 
 
+
+
 /**
  * @brief RPUtility::readRegisterValue reads the value of the 32-bit register in which the parameter is stored and returns it in unsigned long format
  * @param parameter
@@ -628,7 +635,4 @@ unsigned long RPUtility::readRegisterValueOfParameter(std::string parameter,int 
 }
 
 
-RPUtility::RPUtility()
-{
 
-}

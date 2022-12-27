@@ -36,6 +36,8 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void connectParameterInterface();
+
 private:
     Ui::MainWindow *ui;
     RPUtility rpUtility;

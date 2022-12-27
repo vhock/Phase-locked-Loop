@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectionIndicatorScene = new QGraphicsScene(this);
 
+   ;
+
     ui->connectionIndicator->setScene(connectionIndicatorScene);
     ui->connectionIndicator->show();
     connectionIndicatorScene->setBackgroundBrush(Qt::red); //offline
@@ -31,17 +33,18 @@ MainWindow::MainWindow(QWidget *parent)
     //connect UI parameter fields to the Red Pitaya utility
     ui->pll1_amplitude_box->setKeyboardTracking(false);
     ui->pll1_phase_box->setKeyboardTracking(false);
-
     ui->pll1_freq_box->setKeyboardTracking(false);
     ui->pll1_bandwith_box->setKeyboardTracking(false);
-
     ui->pll1_kp_box->setKeyboardTracking(false);
     ui->pll1_ki_box->setKeyboardTracking(false);
-
-
     ui->pll1_alpha_box->setKeyboardTracking(false);
-
     ui->pll1_order_box->setKeyboardTracking(false);
+
+    connectParameterInterface();
+
+
+
+
 
 
     //set keyboard tracking to false for all spinboxes, does not work unfortunately
@@ -55,59 +58,6 @@ MainWindow::MainWindow(QWidget *parent)
 //    for (iter = spinBoxlist.begin(); iter != spinBoxlist.end(); ++iter){
 //        //iter->setKeyboardTracking(false);
 //}
-
-    QObject::connect(ui->output1_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
-        rpUtility.parameterChangedListener("output_1",newValue,0);}
-    );
-
-    QObject::connect(ui->output2_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
-        rpUtility.parameterChangedListener("output_2",newValue,0);}
-    );
-
-
-    QObject::connect(ui->pll1_2nd_harm_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("2nd_harm",newValue,0);}
-    );
-    QObject::connect(ui->pll1_pid_en_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("pid_en",newValue,0);}
-    );
-
-    QObject::connect(ui->pll1_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("a",newValue,0);}
-    );
-
-
-    QObject::connect(ui->pll1_phase_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("phi",newValue,0);}
-    );
-
-
-    QObject::connect(ui->pll1_kp_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("kp",newValue,0);}
-    );
-
-    QObject::connect(ui->pll1_ki_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("ki",newValue,0);}
-    );
-
-
-    QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("f0",newValue,0);}
-    );
-
-    QObject::connect(ui->pll1_bandwith_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("bw",newValue,0);}
-    );
-
-
-
-    QObject::connect(ui->pll1_alpha_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("alpha",newValue,0);}
-    );
-
-    QObject::connect(ui->pll1_order_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("order",newValue,0);}
-    );
 
 
     //  QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
@@ -129,21 +79,14 @@ void MainWindow::on_connectButton_clicked()
         return;
     }else {
         logMessages("Valid IP");
-        auto currID= std::this_thread::get_id();
-
-
         std::thread connectionThread(&RPUtility::connect,&rpUtility,ipAddressText);
-        connectionThread.detach();
-        logMessages("detached");
-        //Sleep(30000);
-        //rpUtility.disconnect();
-        //int connectionSuccessful= rpUtility.connect(text);
-        logMessages("main thread continues");
-
-        int x=4;
+        connectionThread.detach();  
 
     }
 }
+
+
+
 //slots
 void MainWindow::logMessages(std::string message){
     QString qstring= QString::fromStdString(message);
@@ -152,12 +95,13 @@ void MainWindow::logMessages(std::string message){
 };
 
 void  MainWindow::connectionStateChangedListener(int code){
-    if (code==1){
+    if (code==1){//active
         connectionIndicatorScene->clear();//i do not want to bother with finding the text for now
         connectionIndicatorScene->setBackgroundBrush(Qt::green); //online
         connectionIndicatorScene->addText("Online");
         ui->disconnectButton->setEnabled(true);
         ui->connectButton->setEnabled(false);
+
 
     }
     if (code==0){
@@ -166,6 +110,8 @@ void  MainWindow::connectionStateChangedListener(int code){
         connectionIndicatorScene->addText("Offline");
         ui->disconnectButton->setEnabled(false);
         ui->connectButton->setEnabled(true);
+
+
     }
 
 
@@ -224,3 +170,57 @@ void MainWindow::on_pushButton_clicked()
 int x=4;
 }
 
+void MainWindow::connectParameterInterface(){
+    QObject::connect(ui->output1_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
+        rpUtility.parameterChangedListener("output_1",newValue,0);}
+    );
+
+    QObject::connect(ui->output2_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
+        rpUtility.parameterChangedListener("output_2",newValue,0);}
+    );
+
+
+    QObject::connect(ui->pll1_2nd_harm_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("2nd_harm",newValue,0);}
+    );
+    QObject::connect(ui->pll1_pid_en_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("pid_en",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("a",newValue,0);}
+    );
+
+
+    QObject::connect(ui->pll1_phase_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("phi",newValue,0);}
+    );
+
+
+    QObject::connect(ui->pll1_kp_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("kp",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_ki_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("ki",newValue,0);}
+    );
+
+
+    QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("f0",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_bandwith_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("bw",newValue,0);}
+    );
+
+
+
+    QObject::connect(ui->pll1_alpha_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("alpha",newValue,0);}
+    );
+
+    QObject::connect(ui->pll1_order_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
+        rpUtility.parameterChangedListener("order",newValue,0);}
+    );
+}
