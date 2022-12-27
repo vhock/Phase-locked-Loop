@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->connectionIndicator->show();
     connectionIndicatorScene->setBackgroundBrush(Qt::red); //offline
     connectionIndicatorScene->addText("Offline");
+
+    disableKeyBoardTracking();
     // a red background
 
     //QLabel * f0Label=new QLabel(ui->pll1_f0_box);
