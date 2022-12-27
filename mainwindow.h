@@ -38,6 +38,12 @@ private slots:
 
     void connectParameterInterface();
 
+    void on_log_parameter_changes_cb_stateChanged(int arg1);
+
+    void disableKeyBoardTracking();
+
+    void parameterInitialValueListener(std::string parameter,double value,int pll);
+
 private:
     Ui::MainWindow *ui;
     RPUtility rpUtility;

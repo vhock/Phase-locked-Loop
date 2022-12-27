@@ -12,7 +12,6 @@ int pll_base_addr[2] = {0x41200000, 0x41300000};
 
 RPUtility::RPUtility()
 {
- emit connectionStateChanged(0);
 }
 
 /* All Red Pitaya parameter values are postive, negative values are encoded by an offset relative to the maximum value
@@ -38,20 +37,66 @@ long RPUtility::shiftNegativeValueForReading(ulong &val,int nbits){
 }
 
 int RPUtility::synchronizeParameters(){
-  for (int pll=0;pll<2;pll++){
-    for (auto const& elem : param_dict)
-    {
-        std::string parameter=elem.first;
-        std::string returnedParameterValue;
-        readParameter(parameter,returnedParameterValue,pll);
-        qDebug()<<"Paremeter "<<qPrintable(QString::fromStdString(parameter+" has the value "+returnedParameterValue));
+    for (int pll=0;pll<2;pll++){
+        for (auto const& elem : param_dict)
+        {
+            std::string parameter=elem.first;
+            std::string value;
+            readParameter(parameter,value,pll);
+            int base_address=pll_base_addr[pll];
+            int paramAddress=base_address+param_dict.at(parameter)[0];
+            int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
+            float val_float = std::stof(value);
+            long val_long{};
+               ulong val_ulong{};
+               std::string value_string{};
 
+
+               if (parameter=="w_a"||parameter=="w_b"){
+                   val_long=std::stol(value);
+                   val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
+               }
+
+               if (parameter=="2nd_harm"||parameter=="pid_en"){
+                   val_ulong=std::stoul(value);
+               }
+
+               if (parameter=="output_1"||parameter=="output_2"){
+                   val_ulong=std::stoul(value);
+               }
+
+
+
+               if (parameter=="alpha"){
+                   float scaled_float = val_float* pow(2,17);
+                   val_ulong = static_cast<unsigned long>(scaled_float);
+               }
+
+               if (parameter=="order"){
+                   val_ulong=static_cast<unsigned long>(val_float)-1;
+
+               }
+
+
+
+               //integration into registers for certain parameters
+               if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
+                       ||parameter=="output_2"||parameter=="2nd_harm"
+                       ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
+                   converter.setParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
+                   unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
+                   val_ulong=integratedValue;
+               }
+
+           qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
+            emit parameterInitialValue(parameter,std::stod(value),pll);
+
+
+        }
 
     }
 
-}
-
-   return 0;
+    return 0;
 }
 
 int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
@@ -89,8 +134,8 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         }
 
         if (parameter=="w_a"||parameter=="w_b"){
-           val_long=std::stol(value);
-           val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
+            val_long=std::stol(value);
+            val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
         }
 
         if (parameter=="2nd_harm"||parameter=="pid_en"){
@@ -159,7 +204,7 @@ T RPUtility::readParameterAsNumber(std::string parameter,int pll ){
     readParameter(parameter,parameterValueAsString,pll);
     double valAsDouble=  std::stod(parameterValueAsString);//this should hopefully be safe
     try{
-    return (T)valAsDouble; //cast to whatever value is wanted
+        return (T)valAsDouble; //cast to whatever value is wanted
     }catch(_exception &ex){
         log_message("Casting number failed");
     }
@@ -174,8 +219,8 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
     try{
         int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
 
-         unsigned long registerValue=readRegisterValueOfParameter(parameter,pll);//read register value at the address of the parameter
-         long parameterValue{};
+        unsigned long registerValue=readRegisterValueOfParameter(parameter,pll);//read register value at the address of the parameter
+        long parameterValue{};
 
 
 
@@ -198,7 +243,7 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
             readParameter("w_b",w_b,pll);
             long w_a_signed=std::stol(w_a);
             long w_b_signed=std::stol(w_b);
-             long phi= atan2(w_a_signed,w_b_signed)/(2*M_PI)*360;
+            long phi= atan2(w_a_signed,w_b_signed)/(2*M_PI)*360;
             result=std::to_string(phi);
             return 0;
         }
@@ -213,7 +258,7 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
 
         }
         if (parameter=="kp"||parameter=="ki"){
-             long shiftedValue= shiftNegativeValueForReading(registerValue,nbits);
+            long shiftedValue= shiftNegativeValueForReading(registerValue,nbits);
             double scaledReply=shiftedValue/pow(2,16);
             result=std::to_string(scaledReply);
             return 0;
@@ -222,21 +267,21 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
 
 
         //these have to be extracted from a register because they do not span the entire 32 bits
-      if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
-                        ||parameter=="output_2"||parameter=="2nd_harm"
-                        ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
+        if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
+                ||parameter=="output_2"||parameter=="2nd_harm"
+                ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
             //perform check first
-//            bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
-//            if (!registerInSync){
-//                emit log_message("Client-host register mismatch for address"+ std::to_string(paramAddress));
-//                return -1;
-//            } //TODO reactivate
+            //            bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
+            //            if (!registerInSync){
+            //                emit log_message("Client-host register mismatch for address"+ std::to_string(paramAddress));
+            //                return -1;
+            //            } //TODO reactivate
 
             unsigned long extractedParameterValue=converter.extractParameter(pll,parameter,registerValue);
             if (parameter=="w_a"||parameter=="w_b"){
                 parameterValue=shiftNegativeValueForReading(extractedParameterValue,nbits);
             }else {
-                 parameterValue=extractedParameterValue;
+                parameterValue=extractedParameterValue;
             }
             result=std::to_string(parameterValue);
 
@@ -251,19 +296,19 @@ int RPUtility::readParameter(std::string parameter,std::string &result,int pll )
         }
 
         if (parameter=="order"){
-           int val_int=static_cast<unsigned long>(parameterValue)+1;
-           result=std::to_string(val_int);
-           return 0;
+            int val_int=static_cast<unsigned long>(parameterValue)+1;
+            result=std::to_string(val_int);
+            return 0;
 
 
 
         }
 
-       if (result.empty()){
-           result=std::to_string(-MAXINT);
-           emit  log_message("Reading parameter "+parameter+" failed.");
-           return -1;
-       }
+        if (result.empty()){
+            result=std::to_string(-MAXINT);
+            emit  log_message("Reading parameter "+parameter+" failed.");
+            return -1;
+        }
 
         return 0;
     }
@@ -282,6 +327,7 @@ int RPUtility::sendCommand(std::string command,std::string &serverReply){
         emit log_message("No active connection, sending command "+command+" failed.");
         return -1;
     }
+
     ssh_channel  channel = ssh_channel_new(active_session);
     ssh_channel_set_blocking(channel,1); //important for the ssh channel actually to actually wait for the reply
     std::string receive = "";
@@ -454,22 +500,12 @@ int RPUtility::connect(std::string ipAddress,std::string user,std::string passwo
     active_session=rp_session; //copy construction, important because if ref to rp_session is used all other threads works with undefined memory
     emit connectionStateChanged(1);
     connection_status=1;
-    //  std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);// launch a thread which monitors the active session
-    //monitorSessionThread.detach();
+    //std::thread monitorSessionThread(&RPUtility::monitorActiveSession,this);// launch a thread which monitors the active session
+   // monitorSessionThread.detach();
     return 0;
 }
 
-int RPUtility::authenticate(ssh_session rp_session,std::string user,std::string password){
-    int auth=ssh_userauth_password(rp_session,user.c_str(),password.c_str());
-    if (auth != SSH_AUTH_SUCCESS)
-    {
-        emit log_message("Authentication failed:"+std::string(ssh_get_error(rp_session)));
-        ssh_disconnect(rp_session);
-        ssh_free(rp_session);
-        return -1;
-    }
 
-}
 
 
 
@@ -609,8 +645,11 @@ int RPUtility::scp_copyBitfile()
 void RPUtility::parameterChangedListener(std::string parameter,double value,int pll){
     setParameter(parameter,std::to_string(value),pll);
     //verify the parameter has been set by reading the parameter and emitting the parameter as log message
-    std::thread logChange(&RPUtility::logParameterChange,this,parameter,pll);
-    logChange.detach();
+    if (logParameterChanges){
+        std::thread logChange(&RPUtility::logParameterChange,this,parameter,pll);
+        logChange.join();
+    }
+    //logChange.detach();
 
 }
 
@@ -632,6 +671,16 @@ unsigned long RPUtility::readRegisterValueOfParameter(std::string parameter,int 
     sendCommand(registerReadCommand,reply); //read register value at the address of the parameter
     unsigned long registerValue=std::stoul( reply,0,16 );
     return registerValue;
+}
+
+/**
+ * @brief parameterInitialValue emits the value of a parameter upon connection for the UI to deal with it
+ * @param parameter
+ * @param value
+ * @param pll
+ */
+void parameterInitialValue(std::string parameter,double value,int pll){
+
 }
 
 

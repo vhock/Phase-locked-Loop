@@ -48,7 +48,7 @@ public:
     int readParameter(std::string parameter,std::string &result,int pll );
    unsigned long readRegisterValueOfParameter(std::string parameter,int pll);
     void parameterChangedListener(std::string parameter,double value,int pll);
-
+   bool logParameterChanges=false;//TODO should be private with getters/setters
 
 
 private:
@@ -92,7 +92,6 @@ private:
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected
     int verify_knownhost();
-    int authenticate(ssh_session,std::string,std::string);
     int openChannel(ssh_session session);
     void monitorActiveSession();
     int setParameter(std::string parameter,std::string value,int pll=0);
@@ -103,7 +102,7 @@ public slots:
 signals:
     void log_message(std::string message);
     void connectionStateChanged(int code);
-
+    void parameterInitialValue(std::string parameter,double value,int pll);//used only once when the connection to the RP is made
 
 };
 
