@@ -45,6 +45,9 @@ int RPUtility::synchronizeParameters(){
         {
             std::string parameter=elem.first;
             std::string value;
+            if ((parameter=="output_1"||parameter=="output_2")&&pll==1){//bugfix
+                continue;
+            }
             readParameter(parameter,value,pll);
             int base_address=pll_base_addr[pll];
             int paramAddress=base_address+param_dict.at(parameter)[0];
