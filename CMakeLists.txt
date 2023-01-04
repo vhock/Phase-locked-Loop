@@ -27,8 +27,8 @@ set(PROJECT_SOURCES
     rputility.h
     rputility.cpp
     rpsshcommunicator.h rpsshcommunicator.cpp
-    rpparameterconverter.h
-    rpparameterconverter.cpp
+    rpregisterutility.h
+    rpregisterutility.cpp
     resources.qrc
     pll_project.bit
     )
