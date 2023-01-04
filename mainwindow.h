@@ -50,8 +50,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    RPUtility rpUtility;
     RPSSHCommunicator rpSSHCommunicator;
+    RPUtility rpUtility;
     QGraphicsScene *connectionIndicatorScene;
 };
 #endif // MAINWINDOW_H

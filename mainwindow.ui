@@ -56,8 +56,8 @@
    <widget class="QTextBrowser" name="statusBox">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>200</y>
+      <x>280</x>
+      <y>150</y>
       <width>221</width>
       <height>31</height>
      </rect>
@@ -161,6 +161,12 @@
       <width>221</width>
       <height>331</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <row>
      <property name="text">
@@ -445,6 +451,12 @@
       <height>101</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
     <row>
      <property name="text">
       <string/>
@@ -678,6 +690,12 @@
       <width>221</width>
       <height>331</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <row>
      <property name="text">
@@ -962,8 +980,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>180</y>
+      <x>280</x>
+      <y>130</y>
       <width>47</width>
       <height>13</height>
      </rect>

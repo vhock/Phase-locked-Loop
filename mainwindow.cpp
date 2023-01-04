@@ -6,7 +6,7 @@
 #include <cassert>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow),rpUtility()
+    , ui(new Ui::MainWindow),rpSSHCommunicator(),rpUtility(&rpSSHCommunicator)
 {
     ui->setupUi(this);
     qRegisterMetaType<std::string>();
@@ -166,7 +166,6 @@ void  MainWindow::connectionStateChangedListener(int code){
         ui->disconnectButton->setEnabled(true);
         ui->connectButton->setEnabled(false);
         rpUtility.synchronizeParameters();
-
         rpUtility.startMonitorActiveSession();
         connectParameterInterface();
 

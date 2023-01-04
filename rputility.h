@@ -23,6 +23,7 @@
 #include <bitset>
 #include <cmath>
 #include <QDebug>
+#include <rpsshcommunicator.h>
 
 
 #ifndef M_PI
@@ -36,6 +37,9 @@ class RPUtility : public QObject
     Q_OBJECT
 public:
     RPUtility();
+    RPUtility(RPSSHCommunicator *rpSSHCommunicator){
+        sshCommunicator=rpSSHCommunicator;
+    }
     static bool isValidIPAddress(std::string ipAddress);
     int connect(std::string ipAddress,std::string user,std::string password);
     int disconnect();
@@ -87,6 +91,7 @@ private:
         { "LI2_Y", "111"              }   ,
     };
     RPRegisterUtility converter{};
+    RPSSHCommunicator* sshCommunicator;
     ulong shiftNegativeValueForWriting(long &val,int nbits);
     long shiftNegativeValueForReading( ulong &val,int nbits);
     ssh_session active_session=NULL;

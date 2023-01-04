@@ -502,8 +502,7 @@ int RPUtility::connect(std::string ipAddress,std::string user,std::string passwo
 
     }
 
-    active_session=rp_session; //copy construction, important because if ref to rp_session is used all other threads works with undefined memory
-
+    active_session= std::move(rp_session); //cannibalize the rp_session
     emit connectionStateChanged(1);
     connection_status=1;
 
