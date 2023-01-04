@@ -1,7 +1,12 @@
 #include "rpparameterconverter.h"
 
-
-void RPParameterConverter::setParameter(int pll,std::string parameter,unsigned long value){
+/**
+ * @brief RPParameterConverter::integrateParameter integrate a parameter into the representation of the 32-bit register it is stored in
+ * @param pll
+ * @param parameter
+ * @param value
+ */
+void RPRegisterUtility::integrateParameter(int pll,std::string parameter,unsigned long value){
     try{
       int  msb = param_dict.at(parameter)[1];
       int  lsb = param_dict.at(parameter)[2];
@@ -27,12 +32,17 @@ void RPParameterConverter::setParameter(int pll,std::string parameter,unsigned l
  * @param receivedValue
  * @return true if registers match, false otherwise
  */
-bool RPParameterConverter::verifyParameterRegisterMatch(int pll,std::string parameter,unsigned long receivedValue){
+bool RPRegisterUtility::verifyParameterRegisterMatch(int pll,std::string parameter,unsigned long receivedValue){
     unsigned long localRegisterValue=  getParameterRegister(pll,parameter);
     return localRegisterValue==receivedValue;
 }
-
-unsigned long RPParameterConverter::extractParameter(int pll,std::string parameter,const unsigned long &receivedValue){
+/**
+ * @brief RPParameterConverter::integrateParameter extract a parameter from the 32-bit register it is stored in
+ * @param pll
+ * @param parameter
+ * @param value
+ */
+unsigned long RPRegisterUtility::extractParameter(int pll,std::string parameter,const unsigned long &receivedValue){
     std::bitset<32> receivedValueAsBitset{receivedValue};
     std::bitset<32> extractedParameterBitset{};//parameter does not have 32 bit, but std::bitset needs a fixed size
     int  msb = param_dict.at(parameter)[1];
@@ -45,7 +55,7 @@ unsigned long RPParameterConverter::extractParameter(int pll,std::string paramet
 
 }
 
-RPParameterConverter::RPParameterConverter()
+RPRegisterUtility::RPRegisterUtility()
 {
 
     //baseAddressTo32Bitset.emplace(0,{"w_a",std::make_shared<std::bitset<32>>(pll1_reg_2)});
@@ -92,7 +102,7 @@ RPParameterConverter::RPParameterConverter()
  * @param parameter
  * @return the register containing the parameter converted from a 32-bitset to an unsigned long value
  */
-unsigned long RPParameterConverter::getParameterRegister(int pll,std::string parameter){
+unsigned long RPRegisterUtility::getParameterRegister(int pll,std::string parameter){
 
    std::string bitsetval= parameterTo32BitsetMap.at(pll).at(parameter)->to_string();
  //   qDebug()<<"Bitset:"<<qPrintable(QString::fromStdString(bitsetval)); very useful but slow

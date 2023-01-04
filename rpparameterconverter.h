@@ -11,12 +11,12 @@
  * depict the current state of the actual memory register on the Red Pitaya.
  *
  * */
-class RPParameterConverter
+class RPRegisterUtility
 {
     friend class RPUtility;
 public:
-    RPParameterConverter();
-   void setParameter(int pll,std::string parameter,unsigned long value);
+    RPRegisterUtility();
+   void integrateParameter(int pll,std::string parameter,unsigned long value);
    unsigned long getParameterRegister(int pll,std::string parameter);
    bool verifyParameterRegisterMatch(int pll,std::string parameter,unsigned long receivedValue);//compare the received value for reading the register storing a certain parameter with the bitset mirroring this specific register
    unsigned long extractParameter(int pll,std::string parameter,const unsigned long &receivedValue);

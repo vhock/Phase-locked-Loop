@@ -86,7 +86,7 @@ private:
         { "LI1_X", "110"              }   ,
         { "LI2_Y", "111"              }   ,
     };
-    RPParameterConverter converter{};
+    RPRegisterUtility converter{};
     ulong shiftNegativeValueForWriting(long &val,int nbits);
     long shiftNegativeValueForReading( ulong &val,int nbits);
     ssh_session active_session=NULL;

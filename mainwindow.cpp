@@ -177,6 +177,7 @@ void  MainWindow::connectionStateChangedListener(int code){
         connectionIndicatorScene->addText("Offline");
         ui->disconnectButton->setEnabled(false);
         ui->connectButton->setEnabled(true);
+        disconnectParameterInterface();
 
 
     }
@@ -201,8 +202,10 @@ void MainWindow::on_disconnectButton_clicked()
 
 void MainWindow::on_loadBitfileButton_clicked()
 {
-    rpUtility.scp_copyBitfile();
-    rpUtility.executeBitfile();
+   int copySuccessful= rpUtility.scp_copyBitfile();
+   if (copySuccessful==0){
+       rpUtility.executeBitfile();
+   }
 }
 
 
@@ -228,15 +231,87 @@ void MainWindow::on_pushButton_clicked()
     // rpConv.setParameter(0,"output_2",5);//101-in2
     // unsigned long ans2= rpConv.getParameterRegister(0,"2nd_harm");
     // assert(ans==233);
-    rpUtility.synchronizeParameters();
 
-
-
-
-
-    int x=4;
 }
+void MainWindow::disconnectParameterInterface(){
+    QObject::disconnect(ui->output1_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),nullptr,nullptr
+        );
+    QObject::disconnect(ui->output1_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),nullptr,nullptr
+        );
 
+        QObject::disconnect(ui->output2_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),nullptr,nullptr
+        );
+        //PLL1
+
+        QObject::disconnect(ui->pll1_2nd_harm_cb, &QCheckBox::clicked,nullptr,nullptr
+        );
+        QObject::disconnect(ui->pll1_pid_en_cb, &QCheckBox::clicked,nullptr,nullptr
+        );
+
+        QObject::disconnect(ui->pll1_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+        QObject::disconnect(ui->pll1_phase_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+        QObject::disconnect(ui->pll1_kp_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),nullptr,nullptr
+        );
+
+        QObject::disconnect(ui->pll1_ki_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+        QObject::disconnect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+        QObject::disconnect(ui->pll1_bandwith_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+        QObject::disconnect(ui->pll1_alpha_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),nullptr,nullptr
+        );
+
+        QObject::disconnect(ui->pll1_order_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+        //PLL2
+
+        QObject::disconnect(ui->pll2_2nd_harm_cb, &QCheckBox::clicked,nullptr,nullptr
+        );
+        QObject::disconnect(ui->pll2_pid_en_cb, &QCheckBox::clicked,nullptr,nullptr);
+
+        QObject::disconnect(ui->pll2_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+        QObject::disconnect(ui->pll2_phase_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr);
+
+
+        QObject::disconnect(ui->pll2_kp_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),nullptr,nullptr
+        );
+
+        QObject::disconnect(ui->pll2_ki_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+        QObject::disconnect(ui->pll2_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+        QObject::disconnect(ui->pll2_bandwith_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+
+        QObject::disconnect(ui->pll2_alpha_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),nullptr,nullptr
+        );
+
+        QObject::disconnect(ui->pll2_order_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),nullptr,nullptr
+        );
+
+
+}
 //disables keyboard tracking for the spinboxes because annoying
 void MainWindow::disableKeyBoardTracking(){
     //pll1

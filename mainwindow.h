@@ -38,6 +38,8 @@ private slots:
 
     void connectParameterInterface();
 
+    void disconnectParameterInterface();
+
     void on_log_parameter_changes_cb_stateChanged(int arg1);
 
     void disableKeyBoardTracking();

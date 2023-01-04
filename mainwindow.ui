@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>843</width>
-    <height>606</height>
+    <height>618</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -387,9 +387,9 @@
    <widget class="QPushButton" name="sendArbitraryCommandBtn">
     <property name="geometry">
      <rect>
-      <x>694</x>
+      <x>684</x>
       <y>310</y>
-      <width>91</width>
+      <width>101</width>
       <height>23</height>
      </rect>
     </property>
@@ -400,8 +400,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>130</y>
+      <x>690</x>
+      <y>550</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -440,7 +440,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>110</y>
+      <y>80</y>
       <width>221</width>
       <height>101</height>
      </rect>
@@ -480,7 +480,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>140</y>
+      <y>110</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -530,7 +530,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>170</y>
+      <y>140</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -660,8 +660,8 @@
    <widget class="QCheckBox" name="log_parameter_changes_cb">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>80</y>
+      <x>160</x>
+      <y>550</y>
       <width>151</width>
       <height>21</height>
      </rect>
@@ -959,6 +959,48 @@
      <string/>
     </property>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>180</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Status</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>200</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PLL 1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>200</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PLL 2</string>
+    </property>
+   </widget>
    <zorder>tableWidget</zorder>
    <zorder>ipAddress</zorder>
    <zorder>connectButton</zorder>
@@ -1001,6 +1043,9 @@
    <zorder>pll2_order_box</zorder>
    <zorder>pll2_pid_en_cb</zorder>
    <zorder>pll2_2nd_harm_cb</zorder>
+   <zorder>label_2</zorder>
+   <zorder>label_4</zorder>
+   <zorder>label_5</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1011,8 +1056,20 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionSend_Command"/>
+   </widget>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSend_Command">
+   <property name="text">
+    <string>Send Command</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

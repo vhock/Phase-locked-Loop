@@ -88,7 +88,7 @@ int RPUtility::synchronizeParameters(){
             if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
                     ||parameter=="output_2"||parameter=="2nd_harm"
                     ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
-                converter.setParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
+                converter.integrateParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
                 unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
                 val_ulong=integratedValue;
             }
@@ -183,7 +183,7 @@ int RPUtility::setParameter(std::string parameter,std::string value,int pll ){
         if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
                 ||parameter=="output_2"||parameter=="2nd_harm"
                 ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
-            converter.setParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
+            converter.integrateParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
             unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
             val_ulong=integratedValue;
         }
@@ -328,7 +328,7 @@ int RPUtility::sendCommand(std::string command,std::string &serverReply){
     int rc;
     char buffer[1];
     int nbytes;
-    if (active_session==NULL){
+    if (active_session==NULL||connection_status!=1){
         emit log_message("No active connection, sending command "+command+" failed.");
         return -1;
     }
@@ -577,74 +577,87 @@ void RPUtility::monitorActiveSession(){
 
 int RPUtility::executeBitfile(){
     //verify that the file exists
-    std::string testCommand=RP_FILEXISTS_COMMAND;
-    std::string reply("");
-    sendCommand(RP_FILEXISTS_COMMAND,reply);
-    if (reply.empty()){
-        return -1; //file not found
+    try{
+
+
+        std::string testCommand=RP_FILEXISTS_COMMAND;
+        std::string reply("");
+        sendCommand(RP_FILEXISTS_COMMAND,reply);
+        if (reply.empty()){
+            return -1; //file not found
+        }
+        else {
+            sendCommand(RP_EXECUTE_BITFILE_COMMAND,reply);
+        }
+        emit log_message("Executed bitfile "+PLL_BITFILE);}
+    catch(...){
+        emit log_message("Executing Bitfile failed");
     }
-    else {
-        sendCommand(RP_EXECUTE_BITFILE_COMMAND,reply);
-    }
-    emit log_message("Executed bitfile "+PLL_BITFILE);
 }
 
 int RPUtility::scp_copyBitfile()
-{
-    ssh_scp scp;
-    int rc;
+{   try{
+        if( this->connection_status!=1){//no active connection
+            emit log_message("No active connection");
+            return -1;
+           }
+        ssh_scp scp;
+        int rc;
 
-    scp = ssh_scp_new
-            (active_session, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, "/tmp/");
-    if (scp == NULL)
-    {
-        fprintf(stderr, "Error allocating scp session: %s\n",
-                ssh_get_error(active_session));
-        return SSH_ERROR;
+        scp = ssh_scp_new
+                (active_session, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, "/tmp/");
+        if (scp == NULL)
+        {
+            fprintf(stderr, "Error allocating scp session: %s\n",
+                    ssh_get_error(active_session));
+            return SSH_ERROR;
+        }
+        int status=ssh_get_status(active_session) ;
+        rc = ssh_scp_init(scp);
+        if (rc != SSH_OK)
+        {
+            emit log_message("Error initializing scp session: %s\n"+
+                             std::string(ssh_get_error(active_session)));
+            fprintf(stderr, "Error initializing scp session: %s\n",
+                    ssh_get_error(active_session));
+            ssh_scp_free(scp);
+            return rc;
+        }
+
+        //read local bit file into bitstring
+        std::string filePath=":/"+PLL_BITFILE;
+        QString qFilePath =QString::fromStdString(filePath);
+        QFile knightRider(qFilePath);
+        bool kRxists=knightRider.exists();
+        knightRider.open(QIODevice::ReadOnly); //TODO safety
+        QByteArray blob = knightRider.readAll();
+
+
+        int length=blob.length();
+
+        //knight rider
+        rc = ssh_scp_push_file
+                (scp, PLL_BITFILE.c_str(), length, 0400 |  0200);
+        if (rc != SSH_OK)
+        {
+            emit log_message("Can't open remote file: %s\n"+
+                             std::string(ssh_get_error(active_session)));
+            return rc;
+        }
+
+        rc = ssh_scp_write(scp, blob, length);
+        if (rc != SSH_OK)
+        {
+            emit log_message( "Can't write to remote file: %s\n"+
+                              std::string(ssh_get_error(active_session)));
+            return rc;
+        }
+        //nothing went wrong
+        emit log_message("Succesfully copied bitfile "+PLL_BITFILE+" to "+"/tmp/");
+        return SSH_OK;}
+    catch (...){
+        emit log_message("Could not copy bitfile");
     }
-    int status=ssh_get_status(active_session) ;
-    rc = ssh_scp_init(scp);
-    if (rc != SSH_OK)
-    {
-        emit log_message("Error initializing scp session: %s\n"+
-                         std::string(ssh_get_error(active_session)));
-        fprintf(stderr, "Error initializing scp session: %s\n",
-                ssh_get_error(active_session));
-        ssh_scp_free(scp);
-        return rc;
-    }
-
-    //read local bit file into bitstring
-    std::string filePath=":/"+PLL_BITFILE;
-    QString qFilePath =QString::fromStdString(filePath);
-    QFile knightRider(qFilePath);
-    bool kRxists=knightRider.exists();
-    knightRider.open(QIODevice::ReadOnly); //TODO safety
-    QByteArray blob = knightRider.readAll();
-
-
-    int length=blob.length();
-
-    //knight rider
-    rc = ssh_scp_push_file
-            (scp, PLL_BITFILE.c_str(), length, 0400 |  0200);
-    if (rc != SSH_OK)
-    {
-        emit log_message("Can't open remote file: %s\n"+
-                         std::string(ssh_get_error(active_session)));
-        return rc;
-    }
-
-    rc = ssh_scp_write(scp, blob, length);
-    if (rc != SSH_OK)
-    {
-        emit log_message( "Can't write to remote file: %s\n"+
-                          std::string(ssh_get_error(active_session)));
-        return rc;
-    }
-    //nothing went wrong
-    emit log_message("Succesfully copied bitfile "+PLL_BITFILE+" to "+"/tmp/");
-    return SSH_OK;
 }
 
 
