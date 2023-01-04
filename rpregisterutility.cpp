@@ -1,4 +1,4 @@
-#include "rpparameterconverter.h"
+#include "rpregisterutility.h"
 
 /**
  * @brief RPParameterConverter::integrateParameter integrate a parameter into the representation of the 32-bit register it is stored in

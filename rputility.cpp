@@ -627,10 +627,14 @@ int RPUtility::scp_copyBitfile()
         //read local bit file into bitstring
         std::string filePath=":/"+PLL_BITFILE;
         QString qFilePath =QString::fromStdString(filePath);
-        QFile knightRider(qFilePath);
-        bool kRxists=knightRider.exists();
-        knightRider.open(QIODevice::ReadOnly); //TODO safety
-        QByteArray blob = knightRider.readAll();
+        QFile bitFile(qFilePath);
+        bool kRxists=bitFile.exists();
+        if (!kRxists){
+            emit log_message("Error parsing bitfile");
+            return -1;
+        }
+        bitFile.open(QIODevice::ReadOnly); //TODO safety
+        QByteArray blob = bitFile.readAll();
 
 
         int length=blob.length();
