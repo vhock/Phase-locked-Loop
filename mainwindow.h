@@ -6,6 +6,8 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <rputility.h>
+#include "rpsshcommunicator.h"
+
 #include <rpregisterutility.h>
 Q_DECLARE_METATYPE(std::string)
 //Q_DECLARE_METATYPE(int)
@@ -49,6 +51,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     RPUtility rpUtility;
+    RPSSHCommunicator rpSSHCommunicator;
     QGraphicsScene *connectionIndicatorScene;
 };
 #endif // MAINWINDOW_H

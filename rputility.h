@@ -93,11 +93,9 @@ private:
     std::string last_message;
     int connection_status=0; //0 disconnected, 1 connected
     int verify_knownhost();
-    int openChannel(ssh_session session);
     int setParameter(std::string parameter,std::string value,int pll=0);
     void logParameterChange(std::string parameter,int pll);
     // void rescaleNegativeValue(long &val,int nbits);
-public slots:
 
 signals:
     void log_message(std::string message);

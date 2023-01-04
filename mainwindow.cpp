@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     qRegisterMetaType<std::string>();
     // qRegisterMetaType<int>();
 
+    //QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
 
     QObject::connect(&rpUtility,&RPUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
     QObject::connect(&rpUtility,&RPUtility::connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
