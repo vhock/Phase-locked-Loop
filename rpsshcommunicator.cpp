@@ -176,6 +176,8 @@ int RPSSHCommunicator::connect(std::string ipAddress,std::string user,std::strin
     //  }
 
     //Authentication
+    emit ssh_log_message("Authenticating..");
+
     int auth=ssh_userauth_password(rp_session,user.c_str(),password.c_str());
     if (auth != SSH_AUTH_SUCCESS)
     {
@@ -184,7 +186,7 @@ int RPSSHCommunicator::connect(std::string ipAddress,std::string user,std::strin
         ssh_free(rp_session);
         return -1;
     }else {
-        emit ssh_log_message("Authentication successful:"+std::string(ssh_get_error(rp_session)));
+        emit ssh_log_message("Authentication successful."+std::string(ssh_get_error(rp_session)));
 
     }
 

@@ -50,6 +50,7 @@ public:
 
 
     bool logParameterChanges=false;//TODO should be private with getters/setters
+    bool validateRegisters=false; //check if the local register models match the real registers in the RP
 
 private:
     static const std::string XDEVCFG_DIR;

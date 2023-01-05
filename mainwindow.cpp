@@ -6,7 +6,7 @@
 #include <cassert>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow),rpSSHCommunicator(),rpUtility(&rpSSHCommunicator)
+    , ui(new Ui::MainWindow),rpSSHCommunicator(),rpParameterUtility(&rpSSHCommunicator)
 {
     ui->setupUi(this);
     qRegisterMetaType<std::string>();
@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
 
 
-    QObject::connect(&rpUtility,&RPParameterUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
+    QObject::connect(&rpParameterUtility,&RPParameterUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
 
     connectionIndicatorScene = new QGraphicsScene(this);
 
@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     //red pitaya listens to parameter changes sent by UI
 
 
-    QObject::connect(&rpUtility,&RPParameterUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
+    QObject::connect(&rpParameterUtility,&RPParameterUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
 
 
     // UI listens to up-to-date parameter values sent by RP upon initial connection
@@ -166,7 +166,7 @@ void  MainWindow::connectionStateChangedListener(int code){
         connectionIndicatorScene->addText("Online");
         ui->disconnectButton->setEnabled(true);
         ui->connectButton->setEnabled(false);
-        rpUtility.synchronizeParameters();
+        rpParameterUtility.synchronizeParameters();
         rpSSHCommunicator.startMonitorActiveSession();
         connectParameterInterface();
 
@@ -336,106 +336,106 @@ void MainWindow::disableKeyBoardTracking(){
 }
 void MainWindow::connectParameterInterface(){
     QObject::connect(ui->output1_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
-        rpUtility.parameterChangedListener("output_1",newValue,0);}
+        rpParameterUtility.parameterChangedListener("output_1",newValue,0);}
     );
 
     QObject::connect(ui->output2_combobox,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=]( const int &newValue ) {
-        rpUtility.parameterChangedListener("output_2",newValue,0);}
+        rpParameterUtility.parameterChangedListener("output_2",newValue,0);}
     );
     //PLL1
 
     QObject::connect(ui->pll1_2nd_harm_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("2nd_harm",newValue,0);}
+        rpParameterUtility.parameterChangedListener("2nd_harm",newValue,0);}
     );
     QObject::connect(ui->pll1_pid_en_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("pid_en",newValue,0);}
+        rpParameterUtility.parameterChangedListener("pid_en",newValue,0);}
     );
 
     QObject::connect(ui->pll1_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("a",newValue,0);}
+        rpParameterUtility.parameterChangedListener("a",newValue,0);}
     );
 
 
     QObject::connect(ui->pll1_phase_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("phi",newValue,0);}
+        rpParameterUtility.parameterChangedListener("phi",newValue,0);}
     );
 
 
     QObject::connect(ui->pll1_kp_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("kp",newValue,0);}
+        rpParameterUtility.parameterChangedListener("kp",newValue,0);}
     );
 
     QObject::connect(ui->pll1_ki_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("ki",newValue,0);}
+        rpParameterUtility.parameterChangedListener("ki",newValue,0);}
     );
 
 
     QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("f0",newValue,0);}
+        rpParameterUtility.parameterChangedListener("f0",newValue,0);}
     );
 
     QObject::connect(ui->pll1_bandwith_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("bw",newValue,0);}
+        rpParameterUtility.parameterChangedListener("bw",newValue,0);}
     );
 
 
     QObject::connect(ui->pll1_alpha_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("alpha",newValue,0);}
+        rpParameterUtility.parameterChangedListener("alpha",newValue,0);}
     );
 
     QObject::connect(ui->pll1_order_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("order",newValue,0);}
+        rpParameterUtility.parameterChangedListener("order",newValue,0);}
     );
 
     //PLL2
 
     QObject::connect(ui->pll2_2nd_harm_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("2nd_harm",newValue,1);}
+        rpParameterUtility.parameterChangedListener("2nd_harm",newValue,1);}
     );
     QObject::connect(ui->pll2_pid_en_cb, &QCheckBox::clicked,[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("pid_en",newValue,1);}
+        rpParameterUtility.parameterChangedListener("pid_en",newValue,1);}
     );
 
     QObject::connect(ui->pll2_amplitude_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("a",newValue,1);}
+        rpParameterUtility.parameterChangedListener("a",newValue,1);}
     );
 
 
     QObject::connect(ui->pll2_phase_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("phi",newValue,1);}
+        rpParameterUtility.parameterChangedListener("phi",newValue,1);}
     );
 
 
     QObject::connect(ui->pll2_kp_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("kp",newValue,1);}
+        rpParameterUtility.parameterChangedListener("kp",newValue,1);}
     );
 
     QObject::connect(ui->pll2_ki_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("ki",newValue,1);}
+        rpParameterUtility.parameterChangedListener("ki",newValue,1);}
     );
 
 
     QObject::connect(ui->pll2_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("f0",newValue,1);}
+        rpParameterUtility.parameterChangedListener("f0",newValue,1);}
     );
 
     QObject::connect(ui->pll2_bandwith_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("bw",newValue,1);}
+        rpParameterUtility.parameterChangedListener("bw",newValue,1);}
     );
 
 
 
     QObject::connect(ui->pll2_alpha_box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("alpha",newValue,1);}
+        rpParameterUtility.parameterChangedListener("alpha",newValue,1);}
     );
 
     QObject::connect(ui->pll2_order_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),[=]( const double &newValue ) {
-        rpUtility.parameterChangedListener("order",newValue,1);}
+        rpParameterUtility.parameterChangedListener("order",newValue,1);}
     );
 }
 
 void MainWindow::on_log_parameter_changes_cb_stateChanged(int arg1)
 {
-    rpUtility.logParameterChanges=arg1;
+    rpParameterUtility.logParameterChanges=arg1;
 }
 

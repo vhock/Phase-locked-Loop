@@ -51,6 +51,7 @@ long RPParameterUtility::shiftNegativeValueForReading(ulong &val,int nbits){
  * @return
  */
 int RPParameterUtility::synchronizeParameters(){
+    validateRegisters=false; //registers do not match upon initial synchronization, no need to validate
 
 
     for (int pll=0;pll<2;pll++){
@@ -115,6 +116,7 @@ int RPParameterUtility::synchronizeParameters(){
 
     }
     emit log_message("All parameters updated.");
+    validateRegisters=true; //restore this boolean so following parameter changes will validate the register
     return 0;
 }
 
@@ -226,7 +228,7 @@ T RPParameterUtility::readParameterAsNumber(std::string parameter,int pll ){
     try{
         return (T)valAsDouble; //cast to whatever value is wanted
     }catch(...){
-       emit log_message("Casting number failed ");
+        emit log_message("Casting number failed ");
         return -1;
     }
 }
@@ -292,12 +294,13 @@ int RPParameterUtility::readParameter(std::string parameter,std::string &result,
                 ||parameter=="output_2"||parameter=="2nd_harm"
                 ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
             //perform check first
-                        bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
-                        if (!registerInSync){
-                            emit log_message("Client-host register mismatch for parameter "+ parameter);
-                           // return -1;
-                        } //TODO reactivate
-
+            if (validateRegisters){
+                bool registerInSync= converter.verifyParameterRegisterMatch(pll,parameter,registerValue);//the RPParameterConverter class mirrors the Red Pitaya registers. Check that the corresponding register of the parameter is identical to the one received from the Red Pitaya
+                if (!registerInSync){
+                    emit log_message("Client-host register mismatch for parameter "+ parameter);
+                    // return -1;
+                } //TODO reactivate
+            }
             unsigned long extractedParameterValue=converter.extractParameter(pll,parameter,registerValue);
             if (parameter=="w_a"||parameter=="w_b"){
                 parameterValue=shiftNegativeValueForReading(extractedParameterValue,nbits);
