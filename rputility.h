@@ -27,34 +27,29 @@
 
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 #include <rpregisterutility.h>
 // std::ifstream
-class RPUtility : public QObject
+class RPParameterUtility : public QObject
 {
     Q_OBJECT
 public:
-    RPUtility();
-    RPUtility(RPSSHCommunicator *rpSSHCommunicator){
+    RPParameterUtility(RPSSHCommunicator *rpSSHCommunicator){
         sshCommunicator=rpSSHCommunicator;
     }
-    static bool isValidIPAddress(std::string ipAddress);
-    int connect(std::string ipAddress,std::string user,std::string password);
-    int disconnect();
-    int synchronizeParameters();
-    int sendCommand(std::string command,std::string &serverReply);
-    int scp_copyBitfile();
-    int executeBitfile();
-    template <typename T> T readParameterAsNumber(std::string parameter,int pll );
-    void monitorActiveSession();
+
 
     int readParameter(std::string parameter,std::string &result,int pll );
-   unsigned long readRegisterValueOfParameter(std::string parameter,int pll);
+    template <typename T> T readParameterAsNumber(std::string parameter,int pll );
+    unsigned long readRegisterValueOfParameter(std::string parameter,int pll);
     void parameterChangedListener(std::string parameter,double value,int pll);
-   bool logParameterChanges=false;//TODO should be private with getters/setters
-  void startMonitorActiveSession();
+
+    int synchronizeParameters();
+
+
+    bool logParameterChanges=false;//TODO should be private with getters/setters
 
 private:
     static const std::string XDEVCFG_DIR;
@@ -75,8 +70,8 @@ private:
                                                               {"bw",       {0x20008, 31, 0}},
                                                               {"alpha",    {0x30000, 26, 10}},
                                                               {"order",    {0x30000, 2, 0}},
-                                                  //            {"fNCO",     {0x40000,31,0}},//more a signal, ommitted for now
-                                                   //           {"fNCOErr",  {0x50000,31,0}},//more a signal, ommitted for now
+                                                              //            {"fNCO",     {0x40000,31,0}},//more a signal, ommitted for now
+                                                              //           {"fNCOErr",  {0x50000,31,0}},//more a signal, ommitted for now
                                                               {"output_1", {0, 2, 0}},
                                                               {"output_2", {0, 5, 3}}
                                                              };
@@ -92,19 +87,15 @@ private:
     };
     RPRegisterUtility converter{};
     RPSSHCommunicator* sshCommunicator;
+    std::string last_message;
+
+    int setParameter(std::string parameter,std::string value,int pll=0);
     ulong shiftNegativeValueForWriting(long &val,int nbits);
     long shiftNegativeValueForReading( ulong &val,int nbits);
-    ssh_session active_session=NULL;
-    std::string last_message;
-    int connection_status=0; //0 disconnected, 1 connected
-    int verify_knownhost();
-    int setParameter(std::string parameter,std::string value,int pll=0);
     void logParameterChange(std::string parameter,int pll);
-    // void rescaleNegativeValue(long &val,int nbits);
 
 signals:
     void log_message(std::string message);
-    void connectionStateChanged(int code);
     void parameterInitialValue(std::string parameter,double value,int pll);// only once when the connection to the RP is made
 
 };

@@ -12,10 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     qRegisterMetaType<std::string>();
     // qRegisterMetaType<int>();
 
-    //QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
+    QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
+    QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
 
-    QObject::connect(&rpUtility,&RPUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
-    QObject::connect(&rpUtility,&RPUtility::connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
+
+    QObject::connect(&rpUtility,&RPParameterUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
 
     connectionIndicatorScene = new QGraphicsScene(this);
 
@@ -39,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     //red pitaya listens to parameter changes sent by UI
 
 
-    QObject::connect(&rpUtility,&RPUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
+    QObject::connect(&rpUtility,&RPParameterUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
 
 
     // UI listens to up-to-date parameter values sent by RP upon initial connection
@@ -137,13 +138,13 @@ void MainWindow::on_connectButton_clicked()
     std::string ipAddressText= ui->ipAddress->toPlainText().toStdString();
     std::string userText=ui->connect_user_box->toPlainText().toStdString();
     std::string passwordText=ui->connect_password_box->toPlainText().toStdString();
-    bool isValidIP=RPUtility::isValidIPAddress(ipAddressText);
+    bool isValidIP=RPSSHCommunicator::isValidIPAddress(ipAddressText);
     if (!isValidIP){
         logMessages("Invalid IP");
         return;
     }else {
         logMessages("Valid IP");
-        std::thread connectionThread(&RPUtility::connect,&rpUtility,ipAddressText,userText,passwordText);
+        std::thread connectionThread(&RPSSHCommunicator::connect,&rpSSHCommunicator,ipAddressText,userText,passwordText);
         connectionThread.detach();
 
     }
@@ -166,7 +167,7 @@ void  MainWindow::connectionStateChangedListener(int code){
         ui->disconnectButton->setEnabled(true);
         ui->connectButton->setEnabled(false);
         rpUtility.synchronizeParameters();
-        rpUtility.startMonitorActiveSession();
+        rpSSHCommunicator.startMonitorActiveSession();
         connectParameterInterface();
 
 
@@ -194,7 +195,7 @@ void  MainWindow::connectionStateChangedListener(int code){
 
 void MainWindow::on_disconnectButton_clicked()
 {
-    rpUtility.disconnect();
+    rpSSHCommunicator.disconnect();
 }
 
 
@@ -202,9 +203,9 @@ void MainWindow::on_disconnectButton_clicked()
 
 void MainWindow::on_loadBitfileButton_clicked()
 {
-   int copySuccessful= rpUtility.scp_copyBitfile();
+   int copySuccessful= rpSSHCommunicator.scp_copyBitfile();
    if (copySuccessful==0){
-       rpUtility.executeBitfile();
+       rpSSHCommunicator.executeBitfile();
    }
 }
 
@@ -213,7 +214,7 @@ void MainWindow::on_sendArbitraryCommandBtn_clicked()
 {
     auto command= ui->commandBox->toPlainText().toStdString();
     std::string answer{};
-    rpUtility.sendCommand(command,answer);
+    rpSSHCommunicator.sendCommand(command,answer);
     logMessages("Command "+command+" returned: "+answer);
 
 }

@@ -61,7 +61,7 @@ public slots:
 
 signals:
     void ssh_log_message(std::string message);
-    void connectionStateChanged(int code);
+    void ssh_connectionStateChanged(int code);
 
 };
 

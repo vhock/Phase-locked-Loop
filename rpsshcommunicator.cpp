@@ -190,7 +190,7 @@ int RPSSHCommunicator::connect(std::string ipAddress,std::string user,std::strin
 
     active_session=rp_session; //copy construction, important because if ref to rp_session is used all other threads works with undefined memory
 
-    emit connectionStateChanged(1);
+    emit ssh_connectionStateChanged(1);
     connection_status=1;
 
     return 0;
@@ -211,7 +211,7 @@ int RPSSHCommunicator::disconnect(){
             ssh_disconnect(active_session);
             ssh_free(active_session);
             connection_status=0;
-            emit connectionStateChanged(connection_status);
+            emit ssh_connectionStateChanged(connection_status);
             emit ssh_log_message("Disconnected");
             return 0;
         }catch (...){
@@ -229,7 +229,7 @@ int RPSSHCommunicator::disconnect(){
  */
 void RPSSHCommunicator::monitorActiveSession(){
     int isConnected=1;//when this method is called, connection_status is equal 1
-    while (true){
+    while (connection_status==1){
         ssh_channel channel;
         int rc;
         channel = ssh_channel_new(active_session);
@@ -241,19 +241,19 @@ void RPSSHCommunicator::monitorActiveSession(){
             isConnected=0;
             emit ssh_log_message(std::string(ssh_get_error(active_session)));
 
+
         }else {//all good
             isConnected=1;
             ssh_channel_close(channel);
             ssh_channel_free(channel);
         }
         //something changed, emit the according message
-        if (isConnected!=connection_status){
+        if (isConnected!=1){
             connection_status=isConnected;
-            emit connectionStateChanged(connection_status);
+            emit ssh_connectionStateChanged(connection_status);
             if (connection_status==0){
                 emit ssh_log_message("Connection lost:"+std::to_string(rc));
-            }else if (connection_status==1){
-                emit ssh_log_message("Connection established:"+std::to_string(rc));
+                return;
             }
         }
         Sleep(5000); //checking on the connection every few seconds is enough
