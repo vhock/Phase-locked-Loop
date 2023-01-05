@@ -12,25 +12,12 @@ MainWindow::MainWindow(QWidget *parent)
     qRegisterMetaType<std::string>();
     // qRegisterMetaType<int>();
 
-    QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
-    QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
 
+    initConnectionIndicatorScene();
 
-    QObject::connect(&rpParameterUtility,&RPParameterUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
-
-    connectionIndicatorScene = new QGraphicsScene(this);
-
-    ;
-
-    ui->connectionIndicator->setScene(connectionIndicatorScene);
-    ui->connectionIndicator->show();
-    connectionIndicatorScene->setBackgroundBrush(Qt::red); //offline
-    connectionIndicatorScene->addText("Offline");
 
     disableKeyBoardTracking();
-    // a red background
 
-    //QLabel * f0Label=new QLabel(ui->pll1_f0_box);
 
     ui->ipAddress->setText("192.168.20.188"); //TODO for debugging, delete later
     ui->connect_user_box->setText("root");
@@ -38,30 +25,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     //connect UI parameter fields to the Red Pitaya utility
     //red pitaya listens to parameter changes sent by UI
-
-
+    //UI listens to parameter synchronization signals sent by RPParameterUtility
     QObject::connect(&rpParameterUtility,&RPParameterUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
 
 
-    // UI listens to up-to-date parameter values sent by RP upon initial connection
+    //SSH Connection
+    QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_connectionStateChanged,this,&MainWindow::connectionStateChangedListener,Qt::AutoConnection);
 
 
+//Logging
+    QObject::connect(&rpSSHCommunicator,&RPSSHCommunicator::ssh_log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
+    QObject::connect(&rpParameterUtility,&RPParameterUtility::log_message,this,&MainWindow::logMessages,Qt::AutoConnection);
 
-
-    //set keyboard tracking to false for all spinboxes, does not work unfortunately
-    //   QList<QSpinBox> spinBoxlist= this->findChildren<QSpinBox>();
-    //    QList<QSpinBox>::iterator i;
-    //   for (i = spinBoxlist.begin(); i != spinBoxlist.end(); ++i){
-    //        (*i).setKeyboardTracking(false);
-    //   }
-
-
-    //    for (iter = spinBoxlist.begin(); iter != spinBoxlist.end(); ++iter){
-    //        //iter->setKeyboardTracking(false);
-    //}
-
-
-    //  QObject::connect(ui->pll1_freq_box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),&rpUtility,&RPUtility::pll1_f0_ChangedListener,Qt::AutoConnection);
 
 }
 
@@ -180,7 +155,6 @@ void  MainWindow::connectionStateChangedListener(int code){
         ui->connectButton->setEnabled(true);
         disconnectParameterInterface();
 
-
     }
 
 
@@ -214,11 +188,19 @@ void MainWindow::on_sendArbitraryCommandBtn_clicked()
 {
     auto command= ui->commandBox->toPlainText().toStdString();
     std::string answer{};
-    rpSSHCommunicator.sendCommand(command,answer);
+   int commandSent= rpSSHCommunicator.sendCommand(command,answer);
+   if (commandSent==0)
     logMessages("Command "+command+" returned: "+answer);
 
 }
 
+void MainWindow::initConnectionIndicatorScene(){
+    connectionIndicatorScene = new QGraphicsScene(this);
+    ui->connectionIndicator->setScene(connectionIndicatorScene);
+    ui->connectionIndicator->show();
+    connectionIndicatorScene->setBackgroundBrush(Qt::red); //offline
+    connectionIndicatorScene->addText("Offline");
+}
 
 void MainWindow::on_pushButton_clicked()
 {

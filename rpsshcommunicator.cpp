@@ -63,7 +63,12 @@ int RPSSHCommunicator::sendCommand(std::string command,std::string &serverReply)
 }
 
 
-
+/**
+ * @brief RPSSHCommunicator::isValidIPAddress
+ * validates if a certain string is a valid IP address
+ * @param ipAddress
+ * @return true if valid, false otherwise
+ */
 bool RPSSHCommunicator::isValidIPAddress(std::string ipAddress){
     boost::system::error_code ec;
     boost::asio::ip::address::from_string( ipAddress, ec );
@@ -148,7 +153,14 @@ int RPSSHCommunicator::verify_knownhost()
     return 0;
 }
 
-
+/**
+ * @brief RPSSHCommunicator::connect
+ * Connect to the given IP address via SSH
+ * @param ipAddress
+ * @param user
+ * @param password
+ * @return 0 if successful, -1 otherwise
+ */
 int RPSSHCommunicator::connect(std::string ipAddress,std::string user,std::string password){
     emit ssh_log_message("Establishing connection to "+ipAddress);
     ssh_session rp_session = ssh_new();
@@ -198,14 +210,21 @@ int RPSSHCommunicator::connect(std::string ipAddress,std::string user,std::strin
     return 0;
 }
 
-
+/**
+ * @brief RPSSHCommunicator::startMonitorActiveSession
+ * Just for starting a detached thread
+ */
 void RPSSHCommunicator::startMonitorActiveSession(){
     std::thread monitorSessionThread(&RPSSHCommunicator::monitorActiveSession,this);// launch a thread which monitors the active session
     monitorSessionThread.detach();
 }
 
 
-//TODO buggy, disabled for now
+/**
+ * @brief RPSSHCommunicator::disconnect
+ * Disconnect from the active session
+ * @return 0 if disconnection successful, -1 otherwise
+ */
 int RPSSHCommunicator::disconnect(){
     if (active_session!=nullptr&&connection_status==1){
         try{
@@ -217,6 +236,8 @@ int RPSSHCommunicator::disconnect(){
             emit ssh_log_message("Disconnected");
             return 0;
         }catch (...){
+            emit ssh_log_message("Error while disconnecting");
+
             int x=4;
         }
     }
@@ -224,10 +245,12 @@ int RPSSHCommunicator::disconnect(){
 }
 
 
-//never launch me in an undetached thread
-/*
+
+/**
+ * @brief RPSSHCommunicator::monitorActiveSession
  * This method checks if the connection to the Red Pitaya is still active, every 5 seconds
  * In debug mode, this method may cause issues
+ * Never launch in undetached thread!
  */
 void RPSSHCommunicator::monitorActiveSession(){
     int isConnected=1;//when this method is called, connection_status is equal 1
@@ -263,6 +286,11 @@ void RPSSHCommunicator::monitorActiveSession(){
     }
 }
 
+/**
+ * @brief RPSSHCommunicator::executeBitfile
+ * Launch the bitfile
+ * @return
+ */
 int RPSSHCommunicator::executeBitfile(){
     //verify that the file exists
     try{
@@ -283,6 +311,11 @@ int RPSSHCommunicator::executeBitfile(){
     }
 }
 
+/**
+ * @brief RPSSHCommunicator::scp_copyBitfile
+ * copy the bitfile to the red pitaya via SSH
+ * @return
+ */
 int RPSSHCommunicator::scp_copyBitfile()
 {   try{
         if( this->connection_status!=1){//no active connection

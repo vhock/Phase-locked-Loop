@@ -119,7 +119,14 @@ int RPParameterUtility::synchronizeParameters(){
     validateRegisters=true; //restore this boolean so following parameter changes will validate the register
     return 0;
 }
-
+/**
+ * @brief RPParameterUtility::setParameter
+ * Set parameter to a certain value for a certain PLL
+ * @param parameter
+ * @param value
+ * @param pll
+ * @return
+ */
 int RPParameterUtility::setParameter(std::string parameter,std::string value,int pll ){
     try{
         int base_address=pll_base_addr[pll];
@@ -236,8 +243,14 @@ T RPParameterUtility::readParameterAsNumber(std::string parameter,int pll ){
 
 
 
-/*Depending on the type of parameter, this method will return a int or float value as a string
- * */
+/**
+ * @brief RPParameterUtility::readParameter
+ * Read a parameter from the the Red Pitaya.Depending on the type of parameter, this method will return a int or float value as a string
+ * @param parameter
+ * @param result
+ * @param pll
+ * @return
+ */
 int RPParameterUtility::readParameter(std::string parameter,std::string &result,int pll ){
     try{
         int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
@@ -343,53 +356,13 @@ int RPParameterUtility::readParameter(std::string parameter,std::string &result,
 }
 
 
-//int RPUtility::sendCommand(std::string command,std::string &serverReply){
-//    int rc;
-//    char buffer[1];
-//    int nbytes;
-//    if (active_session==NULL||connection_status!=1){
-//        emit log_message("No active connection, sending command "+command+" failed.");
-//        return -1;
-//    }
 
-//    ssh_channel  channel = ssh_channel_new(active_session);
-//    ssh_channel_set_blocking(channel,1); //important for the ssh channel actually to actually wait for the reply
-//    std::string receive = "";
-
-//    int sessionOK=ssh_channel_open_session(channel);
-//    if (sessionOK == SSH_ERROR){
-//        emit log_message(ssh_get_error(active_session));
-//        return -1;
-//    }
-
-//    rc = channel_request_exec(channel, command.c_str());
-//    if (rc ==SSH_ERROR) {
-//        emit log_message(ssh_get_error(active_session));
-//        return -1;
-//    }
-//    //channel_read(channel, buffer, sizeof(buffer),0);
-//    nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0); //TODO how about is_stderr=1?
-//    while (nbytes > 0)
-//    {
-//        receive.append(buffer, nbytes);
-//        nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
-//    }
-
-//    if (!receive.empty() && receive[receive.length()-1] == '\n') { //remove the newline
-//        receive.erase(receive.length()-1);
-//    }
-//    // emit log_message("Buffer content:");
-//    // emit log_message(receive);
-
-//    //Cleanup
-//    ssh_channel_send_eof(channel);
-//    ssh_channel_close(channel);
-//    ssh_channel_free(channel);
-
-//    serverReply=receive;
-//    return SSH_OK;
-//}
-
+/**
+ * @brief RPParameterUtility::logParameterChange
+ * Send a log message about the parameter change
+ * @param parameter
+ * @param pll
+ */
 void RPParameterUtility::logParameterChange(std::string parameter,int pll){
     std::string result{};
 
@@ -401,7 +374,13 @@ void RPParameterUtility::logParameterChange(std::string parameter,int pll){
 
 
 
-
+/**
+ * @brief RPParameterUtility::parameterChangedListener
+ * Handles parameter change events sent from the UI
+ * @param parameter
+ * @param value
+ * @param pll
+ */
 void RPParameterUtility::parameterChangedListener(std::string parameter,double value,int pll){
     setParameter(parameter,std::to_string(value),pll);
     //verify the parameter has been set by reading the parameter and emitting the parameter as log message
@@ -412,8 +391,6 @@ void RPParameterUtility::parameterChangedListener(std::string parameter,double v
     //logChange.detach();
 
 }
-
-
 
 
 /**

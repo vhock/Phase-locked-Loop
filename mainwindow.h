@@ -48,6 +48,8 @@ private slots:
 
     void parameterInitialValueListener(std::string parameter,double value,int pll);
 
+    void initConnectionIndicatorScene();
+
 private:
     Ui::MainWindow *ui;
     RPSSHCommunicator rpSSHCommunicator;
