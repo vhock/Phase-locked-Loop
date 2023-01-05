@@ -24,8 +24,8 @@ set(PROJECT_SOURCES
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-   rputility.h
-   rputility.cpp
+   rpparameterutility.h
+   rpparameterutility.cpp
     rpsshcommunicator.h
     rpsshcommunicator.cpp
     rpregisterutility.h

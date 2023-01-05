@@ -1,4 +1,4 @@
-#include "rputility.h"
+#include "rpparameterutility.h"
 
 //constants
 const std::string RPParameterUtility::XDEVCFG_DIR="/dev/xdevcfg";

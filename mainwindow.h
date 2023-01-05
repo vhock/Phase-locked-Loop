@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsItem>
-#include <rputility.h>
+#include <rpparameterutility.h>
 #include "rpsshcommunicator.h"
 
 #include <rpregisterutility.h>
