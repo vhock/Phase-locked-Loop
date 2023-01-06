@@ -40,6 +40,11 @@ int RPSSHCommunicator::sendCommand(std::string command,std::string &serverReply)
         return -1;
     }
     //channel_read(channel, buffer, sizeof(buffer),0);
+    if(ssh_channel_get_exit_status(channel)!=0){
+        emit ssh_log_message("SSH channel error status when sending command "+command);
+        return -1;
+    }
+
     nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0); //TODO how about is_stderr=1?
     while (nbytes > 0)
     {
@@ -294,20 +299,25 @@ void RPSSHCommunicator::monitorActiveSession(){
 int RPSSHCommunicator::executeBitfile(){
     //verify that the file exists
     try{
-
-
         std::string testCommand=RP_FILEXISTS_COMMAND;
         std::string reply("");
         sendCommand(RP_FILEXISTS_COMMAND,reply);
         if (reply.empty()){
+            emit ssh_log_message(PLL_BITFILE+" not found");
             return -1; //file not found
         }
         else {
-            sendCommand(RP_EXECUTE_BITFILE_COMMAND,reply);
+            int executed= sendCommand(RP_EXECUTE_BITFILE_COMMAND,reply);
+            if (executed==0){
+                emit ssh_log_message("Executed bitfile "+PLL_BITFILE);
+                return 0;
+            }
+
         }
-        emit ssh_log_message("Executed bitfile "+PLL_BITFILE);}
+    }
     catch(...){
         emit ssh_log_message("Executing Bitfile failed");
+        return -1;
     }
 }
 
@@ -321,7 +331,7 @@ int RPSSHCommunicator::scp_copyBitfile()
         if( this->connection_status!=1){//no active connection
             emit ssh_log_message("No active connection");
             return -1;
-           }
+        }
         ssh_scp scp;
         int rc;
 
@@ -338,7 +348,7 @@ int RPSSHCommunicator::scp_copyBitfile()
         if (rc != SSH_OK)
         {
             emit ssh_log_message("Error initializing scp session: %s\n"+
-                             std::string(ssh_get_error(active_session)));
+                                 std::string(ssh_get_error(active_session)));
             fprintf(stderr, "Error initializing scp session: %s\n",
                     ssh_get_error(active_session));
             ssh_scp_free(scp);
@@ -366,7 +376,7 @@ int RPSSHCommunicator::scp_copyBitfile()
         if (rc != SSH_OK)
         {
             emit ssh_log_message("Can't open remote file: %s\n"+
-                             std::string(ssh_get_error(active_session)));
+                                 std::string(ssh_get_error(active_session)));
             return rc;
         }
 
@@ -374,7 +384,7 @@ int RPSSHCommunicator::scp_copyBitfile()
         if (rc != SSH_OK)
         {
             emit ssh_log_message( "Can't write to remote file: %s\n"+
-                              std::string(ssh_get_error(active_session)));
+                                  std::string(ssh_get_error(active_session)));
             return rc;
         }
         //nothing went wrong

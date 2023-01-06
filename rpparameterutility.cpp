@@ -16,7 +16,7 @@ int pll_base_addr[2] = {0x41200000, 0x41300000};
  *  All Red Pitaya parameter values are postive, negative values are encoded by an offset relative to the maximum value
  * @param val
  * @param nbits
- * @return the always positive value
+ * @return the always positive value as unsigned long
  */
 ulong RPParameterUtility::shiftNegativeValueForWriting(long &val,int nbits){
     if (val<0){
@@ -32,7 +32,7 @@ ulong RPParameterUtility::shiftNegativeValueForWriting(long &val,int nbits){
  *
  * @param val
  * @param nbits
- * @return the (potentially negative) value
+ * @return the (potentially negative) value as signed long
  */
 long RPParameterUtility::shiftNegativeValueForReading(ulong &val,int nbits){
     int64_t maxnbitvalue= static_cast<int64_t>(std::pow(2, nbits));
@@ -52,6 +52,7 @@ long RPParameterUtility::shiftNegativeValueForReading(ulong &val,int nbits){
  */
 int RPParameterUtility::synchronizeParameters(){
     validateRegisters=false; //registers do not match upon initial synchronization, no need to validate
+    emit log_message("Updating parameters..");
 
 
     for (int pll=0;pll<2;pll++){
@@ -108,7 +109,7 @@ int RPParameterUtility::synchronizeParameters(){
                 val_ulong=integratedValue;
             }
 
-            qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
+           // qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
             emit parameterInitialValue(parameter,std::stod(value),pll);
 
 
@@ -258,8 +259,6 @@ int RPParameterUtility::readParameter(std::string parameter,std::string &result,
         unsigned long registerValue=readRegisterValueOfParameter(parameter,pll);//read register value at the address of the parameter
         long parameterValue{};
 
-
-
         if (parameter=="a"){
             std::string w_a{};
             std::string w_b{};
@@ -405,7 +404,13 @@ unsigned long RPParameterUtility::readRegisterValueOfParameter(std::string param
     std::string registerReadCommand=RP_MONITOR_COMMAND+std::to_string(paramAddress);
     int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
     std::string reply{};
-    sshCommunicator->sendCommand(registerReadCommand,reply); //read register value at the address of the parameter
+    int success=sshCommunicator->sendCommand(registerReadCommand,reply); //read register value at the address of the parameter
+
+    if (reply.empty()||success!=0){
+        emit log_message("Failed to read parameter "+parameter);
+        return 999;
+    }
+
     unsigned long registerValue=std::stoul( reply,0,16 );
     return registerValue;
 }

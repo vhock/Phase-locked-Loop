@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    rpSSHCommunicator.disconnect();
+
     delete ui;
 }
 
@@ -179,7 +181,10 @@ void MainWindow::on_loadBitfileButton_clicked()
 {
    int copySuccessful= rpSSHCommunicator.scp_copyBitfile();
    if (copySuccessful==0){
-       rpSSHCommunicator.executeBitfile();
+      int execSuccessful= rpSSHCommunicator.executeBitfile();
+      if (execSuccessful==0){
+          rpParameterUtility.synchronizeParameters();
+      }
    }
 }
 

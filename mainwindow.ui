@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>PLL Control Interface</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTextEdit" name="ipAddress">
