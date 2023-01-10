@@ -1,6 +1,7 @@
-// C++ GUI to interface with the redpitaya based PLL
+// C++ GUI to interface with the RedPitaya based PLL
 // Copyright (C) 2023 Vincent Hock
-//
+//  Based on work by Felix Tebbenjohanns, Domink Windey and Markus Rademacher
+
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or

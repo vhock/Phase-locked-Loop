@@ -243,6 +243,15 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
         std::string reply{};
 
         sshCommunicator->sendCommand(valueSetCommand,reply);
+
+
+        if (parameter=="2nd_harm"){//update the new frequency
+            long freq=readParameterAsNumber<long>("f0",pll);
+            setParameter("f0",std::to_string(freq),pll);
+        }
+
+
+
         return 0;// no issues
     }catch(std::exception &ex){
         emit  log_message("Setting parameter "+parameter+" failed:"+ex.what());
