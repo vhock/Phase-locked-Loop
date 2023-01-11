@@ -36,8 +36,6 @@ private slots:
     void on_sendArbitraryCommandBtn_clicked();
 
 
-    void on_pushButton_clicked();
-
     void connectParameterInterface();
 
     void disconnectParameterInterface();
