@@ -241,8 +241,8 @@ int RPSSHCommunicator::connect(std::string ipAddress,std::string user,std::strin
  * Just for starting a detached thread
  */
 void RPSSHCommunicator::startMonitorActiveSession(){
-    std::thread monitorSessionThread(&RPSSHCommunicator::monitorActiveSession,this);// launch a thread which monitors the active session
-    monitorSessionThread.detach();
+   // std::thread monitorSessionThread(&RPSSHCommunicator::monitorActiveSession,this);// launch a thread which monitors the active session
+   // monitorSessionThread.detach();
 }
 
 

@@ -246,7 +246,9 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
 
 
         if (parameter=="2nd_harm"){//update the new frequency
+            //this covers changes of 2nd_harm from 0 to 1 and 1 to 0
             long freq=readParameterAsNumber<long>("f0",pll);
+            freq=std::stoul(value)==1?(2*freq):freq/2; //if 0 to 1, scale the frequency up by 2, if 1 to 0, scale down by 2
             setParameter("f0",std::to_string(freq),pll);
         }
 
