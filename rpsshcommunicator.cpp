@@ -413,6 +413,7 @@ int RPSSHCommunicator::scp_copyBitfile()
         return SSH_OK;}
     catch (...){
         emit ssh_log_message("Could not copy bitfile");
+        return -1;
     }
 }
 
