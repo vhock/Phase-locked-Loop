@@ -1,27 +1,6 @@
 Based on original project by Felix Tebbenjohanns, https://github.com/tefelixhu/redpitayapll  , Domink Windey and Markus Rademacher
-I provided a C++-based interface with improved functionality and speed.
+I merely provided a C++-based interface instead of the original Python one.
 
-# Getting started
-Windows:
-From the "installer" folder, download the .zip file and extract it to any desired location. Execute the PLLInterface_Cpp.exe to launch the interface. 
-Linux:
-No installer exists so far, it can however be deployed from the source using Qt functionality (https://doc.qt.io/qt-6/linux-deployment.html)
-
-# Usage
-Specify IP-Address, username and password of the Red Pitaya and connect using the "Connect" button. The PLL parameters will be updated automatically if the corresponding bitfile is already running.
-Connection is now active and will be monitored throughout the session.
-If the bitfile is not yet running, press the "Load Bitfile" button. This will copy the FPGA bitfile (Felix Tebbenjohanns) to the /tmp/ folder and execute it.
-If the bitfile was already launched before, a second execution might crash the board and a reboot has to be done.
-Parameters can be set as described in the README below.
-
-If the "Log parameter changes" checkbox is enbaled, parameter values will be read from the FPGA register after setting them and the value will be returned to the log. This slows down the setting of parameters, however.
-
-The "Send shell command" box allows for sending an arbitrary UNIX command to the Red Pitaya, for example sending "ls -all" will return the files in the active directory to the log.
-
-#WARNING
-Parameters can be varied quickly using the spin boxes, however especially for request-heavy actions such as varying A or PHI this can result in "spamming" the Red Pitaya with an amount of SSH requests that leads to connection errors. If this occurs, a reconnect has to be done.
-
-#
 
 # From the original README at https://github.com/tefelixhu/redpitayapll
 
@@ -31,7 +10,14 @@ Initially, this code was hosted on the former [ETH git service](https://git.ee.e
 Tested frequencies go up to about 300 kHz, however the underlying clock frequency is 31.25 MHz making frequencies up to about 10 MHz possible in principle.
 All code is written in VHDL and the top-level connection is done in Vivado 2017.2 using a block-diagram.
 
+# Installation
 
+Either use the precompiled bitfile in the corresponding folder `bitfile/pll_project.bit`, or generate it yourself. You should use Vivado 2017.2.
+Upload it to the redpitaya's file system via scp or so; and launch with the command:
+```
+cat pll_project.bit > /dev/xdevcfg
+```
+A simple server program  written in python 3 can be run on a computer to manipulate the PLL easily (`server/pll.py`) and a more advanced graphical user interface is available if your run the server/gui.py application in python 3. Neccessary packages are `PyQt5`, `paramiko`, and `numpy`. It essentially makes use of the `monitor` command in order to read and write the internal memory. For register definitions see `doc/regs.pdf`. 
 
 # Working principle
 A schematic overview of the implementation can be found in `doc/figures/top_level_diagram.pdf` and `doc/figures/pll_schematic.pdf`.
