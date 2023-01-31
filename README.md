@@ -9,19 +9,19 @@ No installer exists so far, it can however be deployed from the source using Qt 
 
 # Usage
 
-###Connect
+### Connect
 Specify IP-Address, username and password of the Red Pitaya and connect using the "Connect" button. The PLL parameters will be updated automatically if the corresponding bitfile is already running.
 Connection is now active and will be monitored throughout the session.
 
-###Launch bitfile
+### Launch bitfile
 If the bitfile is not yet running, press the "Load Bitfile" button. This will copy the FPGA bitfile (Felix Tebbenjohanns) to the /tmp/ folder and execute it.
 If the bitfile was already launched before, a second execution might crash the board and a reboot has to be done.
 Parameters can be set as described in the README below.
 
-###Log parameter changes
+### Log parameter changes
 If the "Log parameter changes" checkbox is enbaled, parameter values will be read from the FPGA register after setting them and the value will be returned to the log. This slows down the setting of parameters, however.
 
-###Send shell command
+### Send shell command
 The "Send shell command" box allows for sending an arbitrary UNIX command to the Red Pitaya, for example sending "ls -all" will return the files in the active directory to the log.
 
 #WARNING
