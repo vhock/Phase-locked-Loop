@@ -1,0 +1,1154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>841</width>
+    <height>552</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PLL Control Interface</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTextEdit" name="ipAddress">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>20</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>192.168.20.203</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="connectButton">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>110</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Connect</string>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="logBox">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>270</y>
+      <width>331</width>
+      <height>211</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="statusBox">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>190</y>
+      <width>221</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>Disconnected</string>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="connectionIndicator">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="disconnectButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>110</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Disconnect</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loadBitfileButton">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>20</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load Bitfile</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="commandBox">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>70</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Send any aribtrary command from the text field above to the Red Pitaya</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll1_freq_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>360</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>429496729</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>250</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Log</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>150</y>
+      <width>221</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Parameter</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Value</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>2nd Harmonic</string>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="text">
+      <string>PID On</string>
+     </property>
+    </item>
+    <item row="2" column="0">
+     <property name="text">
+      <string>Amplitude</string>
+     </property>
+    </item>
+    <item row="3" column="0">
+     <property name="text">
+      <string>Phase</string>
+     </property>
+    </item>
+    <item row="4" column="0">
+     <property name="text">
+      <string>KP</string>
+     </property>
+    </item>
+    <item row="5" column="0">
+     <property name="text">
+      <string>KI</string>
+     </property>
+    </item>
+    <item row="6" column="0">
+     <property name="text">
+      <string>Frequency</string>
+     </property>
+    </item>
+    <item row="7" column="0">
+     <property name="text">
+      <string>Bandwith</string>
+     </property>
+    </item>
+    <item row="8" column="0">
+     <property name="text">
+      <string>Alpha</string>
+     </property>
+    </item>
+    <item row="9" column="0">
+     <property name="text">
+      <string>Order</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDoubleSpinBox" name="pll1_kp_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>300</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-30000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="pll1_ki_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>330</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-30000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll1_phase_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>270</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>360</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll1_amplitude_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>240</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>127</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll1_bandwith_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>390</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>429496729</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll1_order_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>450</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>8</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="sendArbitraryCommandBtn">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>100</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Send Shell  Command</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="pll1_2nd_harm_cb">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>180</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="pll1_pid_en_cb">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>210</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>20</y>
+      <width>221</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Parameter</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Value</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>Output 1</string>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="text">
+      <string>Output 2</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="output1_combobox">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>50</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>PLL1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PLL2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PLL1 + PLL2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PLL1 + IN2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IN1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IN2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LI1_X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LI2_Y</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="output2_combobox">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>80</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>PLL1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PLL2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PLL1+PLL2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PLL1+IN2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IN1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IN2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LI1_X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LI2_Y</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDoubleSpinBox" name="pll1_alpha_box">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>420</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>1.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="connect_user_box">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>70</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>root</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="connect_password_box">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>70</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>root</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="user_label">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>50</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>User</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="password_label">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>50</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Password</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ip_address_label">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>0</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>IP Address</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="log_parameter_changes_cb">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>480</y>
+      <width>151</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Log Parameter Changes</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>150</y>
+      <width>221</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Parameter</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Value</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>2nd Harmonic</string>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="text">
+      <string>PID On</string>
+     </property>
+    </item>
+    <item row="2" column="0">
+     <property name="text">
+      <string>Amplitude</string>
+     </property>
+    </item>
+    <item row="3" column="0">
+     <property name="text">
+      <string>Phase</string>
+     </property>
+    </item>
+    <item row="4" column="0">
+     <property name="text">
+      <string>KP</string>
+     </property>
+    </item>
+    <item row="5" column="0">
+     <property name="text">
+      <string>KI</string>
+     </property>
+    </item>
+    <item row="6" column="0">
+     <property name="text">
+      <string>Frequency</string>
+     </property>
+    </item>
+    <item row="7" column="0">
+     <property name="text">
+      <string>Bandwith</string>
+     </property>
+    </item>
+    <item row="8" column="0">
+     <property name="text">
+      <string>Alpha</string>
+     </property>
+    </item>
+    <item row="9" column="0">
+     <property name="text">
+      <string>Order</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDoubleSpinBox" name="pll2_kp_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>300</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-30000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll2_freq_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>360</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>429496729</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll2_phase_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>270</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>360</number>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="pll2_ki_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>330</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-30000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll2_amplitude_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>240</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>127</number>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="pll2_alpha_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>420</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>1.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll2_bandwith_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>390</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="maximum">
+     <number>429496729</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pll2_order_box">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>450</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="suffix">
+     <string/>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>8</number>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="pll2_pid_en_cb">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>210</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="pll2_2nd_harm_cb">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>180</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>170</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Status</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PLL 1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>130</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PLL 2</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>50</y>
+      <width>118</width>
+      <height>3</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>130</y>
+      <width>118</width>
+      <height>3</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_3">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>0</y>
+      <width>20</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_4">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>150</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_5">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>0</y>
+      <width>20</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <zorder>logBox</zorder>
+   <zorder>tableWidget</zorder>
+   <zorder>ipAddress</zorder>
+   <zorder>connectButton</zorder>
+   <zorder>statusBox</zorder>
+   <zorder>connectionIndicator</zorder>
+   <zorder>disconnectButton</zorder>
+   <zorder>loadBitfileButton</zorder>
+   <zorder>commandBox</zorder>
+   <zorder>pll1_freq_box</zorder>
+   <zorder>label</zorder>
+   <zorder>pll1_kp_box</zorder>
+   <zorder>pll1_ki_box</zorder>
+   <zorder>pll1_phase_box</zorder>
+   <zorder>pll1_amplitude_box</zorder>
+   <zorder>pll1_bandwith_box</zorder>
+   <zorder>pll1_order_box</zorder>
+   <zorder>sendArbitraryCommandBtn</zorder>
+   <zorder>pll1_2nd_harm_cb</zorder>
+   <zorder>pll1_pid_en_cb</zorder>
+   <zorder>tableWidget_2</zorder>
+   <zorder>output1_combobox</zorder>
+   <zorder>output2_combobox</zorder>
+   <zorder>pll1_alpha_box</zorder>
+   <zorder>connect_user_box</zorder>
+   <zorder>connect_password_box</zorder>
+   <zorder>user_label</zorder>
+   <zorder>password_label</zorder>
+   <zorder>ip_address_label</zorder>
+   <zorder>log_parameter_changes_cb</zorder>
+   <zorder>tableWidget_3</zorder>
+   <zorder>pll2_kp_box</zorder>
+   <zorder>pll2_freq_box</zorder>
+   <zorder>pll2_phase_box</zorder>
+   <zorder>pll2_ki_box</zorder>
+   <zorder>pll2_amplitude_box</zorder>
+   <zorder>pll2_alpha_box</zorder>
+   <zorder>pll2_bandwith_box</zorder>
+   <zorder>pll2_order_box</zorder>
+   <zorder>pll2_pid_en_cb</zorder>
+   <zorder>pll2_2nd_harm_cb</zorder>
+   <zorder>label_2</zorder>
+   <zorder>label_4</zorder>
+   <zorder>label_5</zorder>
+   <zorder>line</zorder>
+   <zorder>line_2</zorder>
+   <zorder>line_3</zorder>
+   <zorder>line_4</zorder>
+   <zorder>line_5</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>841</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionSend_Command"/>
+   </widget>
+   <addaction name="menuTools"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSend_Command">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../Downloads/295747.png</normaloff>../../Downloads/295747.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;To Come..</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

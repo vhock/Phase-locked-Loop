@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>pll_project.bit</file>
+    </qresource>
+</RCC>
