@@ -24,7 +24,7 @@ If the "Log parameter changes" checkbox is enbaled, parameter values will be rea
 ### Send shell command
 The "Send shell command" box allows for sending an arbitrary UNIX command to the Red Pitaya, for example sending "ls -all" will return the files in the active directory to the log.
 
-#WARNING
+***WARNING***
 Parameters can be varied quickly using the spin boxes, however especially for request-heavy actions such as varying A or PHI this can result in "spamming" the Red Pitaya with an amount of SSH requests that leads to connection errors. If this occurs, a reconnect has to be done.
 
 
