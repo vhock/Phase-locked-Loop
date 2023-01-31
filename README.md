@@ -31,14 +31,7 @@ Initially, this code was hosted on the former [ETH git service](https://git.ee.e
 Tested frequencies go up to about 300 kHz, however the underlying clock frequency is 31.25 MHz making frequencies up to about 10 MHz possible in principle.
 All code is written in VHDL and the top-level connection is done in Vivado 2017.2 using a block-diagram.
 
-# Installation
 
-Either use the precompiled bitfile in the corresponding folder `bitfile/pll_project.bit`, or generate it yourself. You should use Vivado 2017.2.
-Upload it to the redpitaya's file system via scp or so; and launch with the command:
-```
-cat pll_project.bit > /dev/xdevcfg
-```
-A simple server program  written in python 3 can be run on a computer to manipulate the PLL easily (`server/pll.py`) and a more advanced graphical user interface is available if your run the server/gui.py application in python 3. Neccessary packages are `PyQt5`, `paramiko`, and `numpy`. It essentially makes use of the `monitor` command in order to read and write the internal memory. For register definitions see `doc/regs.pdf`. 
 
 # Working principle
 A schematic overview of the implementation can be found in `doc/figures/top_level_diagram.pdf` and `doc/figures/pll_schematic.pdf`.
