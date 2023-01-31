@@ -1,5 +1,5 @@
 Based on original project by Felix Tebbenjohanns, https://github.com/tefelixhu/redpitayapll  , Domink Windey and Markus Rademacher
-I provided a C++-based interface with improved functionality instead of the original Python one.
+I provided a C++-based interface with improved functionality and speed.
 
 # Getting started
 Windows:
