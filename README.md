@@ -2,9 +2,9 @@ Based on original project by Felix Tebbenjohanns, https://github.com/tefelixhu/r
 I provided a C++-based interface with improved functionality and speed.
 
 # Getting started
-##Windows:
+### Windows:
 From the "installer" folder, download the .zip file and extract it to any desired location. Execute the PLLInterface_Cpp.exe to launch the interface. 
-###Linux:
+### Linux:
 No installer exists so far, it can however be deployed from the source using Qt functionality (https://doc.qt.io/qt-6/linux-deployment.html)
 
 # Usage
