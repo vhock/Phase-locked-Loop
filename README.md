@@ -7,7 +7,7 @@ From the "installer" folder, download the .zip file and extract it to any desire
 Linux:
 No installer exists so far, it can however be deployed from the source using Qt functionality (https://doc.qt.io/qt-6/linux-deployment.html)
 
-#Usage
+# Usage
 Specify IP-Address, username and password of the Red Pitaya and connect using the "Connect" button. The PLL parameters will be updated automatically if the corresponding bitfile is already running.
 Connection is now active and will be monitored throughout the session.
 If the bitfile is not yet running, press the "Load Bitfile" button. This will copy the FPGA bitfile (Felix Tebbenjohanns) to the /tmp/ folder and execute it.
