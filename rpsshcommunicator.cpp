@@ -1,5 +1,6 @@
 // C++ GUI to interface with the RedPitaya based PLL
 // Copyright (C) 2023 Vincent Hock
+
 //  Based on work by Felix Tebbenjohanns, Domink Windey and Markus Rademacher
 
 // This program is free software: you can redistribute it and/or modify
@@ -264,7 +265,6 @@ int RPSSHCommunicator::disconnect(){
         }catch (...){
             emit ssh_log_message("Error while disconnecting");
 
-            int x=4;
         }
     }
     return -1;

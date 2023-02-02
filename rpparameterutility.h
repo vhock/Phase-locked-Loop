@@ -6,6 +6,7 @@
 #define strcasecmp _stricmp
 #endif
 #include <boost/asio.hpp>
+#include <boost/serialization/serialization.hpp>
 #include<libssh/libssh.h>
 #include<thread>
 #include <iostream>
