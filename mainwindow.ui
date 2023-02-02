@@ -1135,6 +1135,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionSend_Command"/>
+    <addaction name="actionLoad_Parameters"/>
    </widget>
    <addaction name="menuTools"/>
   </widget>
@@ -1145,7 +1146,12 @@
      <normaloff>../../Downloads/295747.png</normaloff>../../Downloads/295747.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;To Come..</string>
+    <string>&amp;Save Parameters</string>
+   </property>
+  </action>
+  <action name="actionLoad_Parameters">
+   <property name="text">
+    <string>Load Parameters</string>
    </property>
   </action>
  </widget>
