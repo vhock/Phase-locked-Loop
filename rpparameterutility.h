@@ -48,7 +48,7 @@ public:
     void parameterChangedListener(std::string parameter,double value,int pll);
 
     int synchronizeParameters();
-
+    int saveParameters();
 
     bool logParameterChanges=false;//TODO should be private with getters/setters
     bool validateRegisters=false; //check if the local register models match the real registers in the RP

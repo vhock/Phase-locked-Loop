@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsItem>
+#include <QFileDialog>
 #include <rpparameterutility.h>
 #include "rpsshcommunicator.h"
 
@@ -47,6 +48,8 @@ private slots:
     void parameterInitialValueListener(std::string parameter,double value,int pll);
 
     void initConnectionIndicatorScene();
+
+    void on_actionSend_Command_triggered();
 
 private:
     Ui::MainWindow *ui;
