@@ -33,6 +33,8 @@
 
 #include <rpregisterutility.h>
 // std::ifstream
+
+
 class RPParameterUtility : public QObject
 {
     Q_OBJECT
@@ -99,6 +101,10 @@ private:
 signals:
     void log_message(std::string message);
     void parameterInitialValue(std::string parameter,double value,int pll);// only once when the connection to the RP is made
+
+
+
+
 
 };
 

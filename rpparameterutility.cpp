@@ -32,6 +32,8 @@ const std::string RPParameterUtility::RP_EXECUTE_BITFILE_COMMAND="cat "+TMPLOCAT
 
 int pll_base_addr[2] = {0x41200000, 0x41300000};
 
+int amplitude_storage_pll1=0;//bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
+int amplitude_storage_pll2=0; //bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
 
 /**
  * @brief RPUtility::shiftNegativeValueForWriting
@@ -179,6 +181,16 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
             long w_b_long=a*cos(phi);
             setParameter("w_a",std::to_string(w_a_long),pll);
             setParameter("w_b",std::to_string(w_b_long),pll);
+
+           /*bugfix: the amplitude tends to shift under phase changes.
+            * Therefore, store the UI value here and set the amplitude again after setting the phase*/
+            if (parameter=="a"){
+                pll==0?amplitude_storage_pll1=a:amplitude_storage_pll2=a;
+            }
+            if (parameter=="phi"){
+                pll==0?setParameter("a",std::to_string(amplitude_storage_pll1),pll): setParameter("a",std::to_string(amplitude_storage_pll2),pll);
+
+            }
             return 0;
 
 
@@ -251,6 +263,8 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
             freq=std::stoul(value)==1?(2*freq):freq/2; //if 0 to 1, scale the frequency up by 2, if 1 to 0, scale down by 2
             setParameter("f0",std::to_string(freq),pll);
         }
+
+
 
 
 
