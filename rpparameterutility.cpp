@@ -334,15 +334,12 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
             unsigned long integratedValue=converter.getParameterRegister(pll,"w_a");//get the full register as a long representation
             val_ulong=integratedValue;
 
-            /*bugfix: the amplitude tends to shift under phase changes.
-            * Therefore, store the UI value here and set the amplitude again after setting the phase*/
             if (parameter=="a"){
                 amplitude_storage_pll[pll]=a;
 
             }
             if (parameter=="phi"){
-                phase_storage_pll[pll]=phi;//store phase for speed
-               // setParameter("a",std::to_string(amplitude_storage_pll[pll]),pll);//maybe this is not needed anymore?
+                phase_storage_pll[pll]=phi;//store phase
             }
 
 
