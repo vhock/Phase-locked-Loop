@@ -169,12 +169,11 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
         long val_long{};
         ulong val_ulong{};
         std::string value_string{};
-        //encode the parameters a and phi into weights w_a and w_b. Set these values.
+        //encode the parameters a and phi into weights w_a and w_b. Integrate these values into a single register value (w_a and w_b share a 32-bit register) and set it in a single ssh command to enhance speed
         if (parameter=="a"||parameter=="phi"){ //TODO this has huge rounding errors, is there a better way to do it?
             std::string w_a{};
             std::string w_b{};
-            //readParameter("w_a",w_a,pll);
-            //readParameter("w_b",w_b,pll);
+
             double a= amplitude_storage_pll[pll]; //current amplitude
             double phi=phase_storage_pll[pll];//current phase
             if (parameter=="a"){//a gets a new value
@@ -187,15 +186,12 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
 
             ulong w_a_ulong=shiftNegativeValueForWriting(w_a_long,getBitCount("w_a"));//val_long;//
             ulong w_b_ulong=shiftNegativeValueForWriting(w_b_long,getBitCount("w_b"));//val_long;//
+
             converter.integrateParameter(pll,"w_a",w_a_ulong); //integrate the parameter into register because it is shared with other parameters
             converter.integrateParameter(pll,"w_b",w_b_ulong); //integrate the parameter into register because it is shared with other parameters
 
             unsigned long integratedValue=converter.getParameterRegister(pll,"w_a");//get the full register as a long representation
             val_ulong=integratedValue;
-
-
-          //  setParameter("w_a",std::to_string(w_a_long),pll);
-           // setParameter("w_b",std::to_string(w_b_long),pll);
 
            /*bugfix: the amplitude tends to shift under phase changes.
             * Therefore, store the UI value here and set the amplitude again after setting the phase*/
@@ -204,18 +200,14 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
 
             }
             if (parameter=="phi"){
-                phase_storage_pll[pll]=phi;
+                phase_storage_pll[pll]=phi;//store phase for speed
                 setParameter("a",std::to_string(amplitude_storage_pll[pll]),pll);//maybe this is not needed anymore?
             }
-          //  return 0;
 
 
         }
 
-//        if (parameter=="w_a"||parameter=="w_b"){
-//            val_long=std::stol(value);
-//            val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
-//        }
+
 
         if (parameter=="2nd_harm"||parameter=="pid_en"){
             val_ulong=std::stoul(value);
@@ -256,7 +248,7 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
         //integration into registers for certain parameters
         if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
                 ||parameter=="output_2"||parameter=="2nd_harm"
-                ||parameter=="pid_en"){//||parameter=="w_a"||parameter=="w_b"){
+                ||parameter=="pid_en"){
             converter.integrateParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
             unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
             val_ulong=integratedValue;
