@@ -32,8 +32,9 @@ const std::string RPParameterUtility::RP_EXECUTE_BITFILE_COMMAND="cat "+TMPLOCAT
 
 int pll_base_addr[2] = {0x41200000, 0x41300000};
 
-int amplitude_storage_pll1=0;//bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
-int amplitude_storage_pll2=0; //bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
+int amplitude_storage_pll[]{0,0};//bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
+double phase_storage_pll[]{0,0};//bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
+
 
 /**
  * @brief RPUtility::shiftNegativeValueForWriting
@@ -67,6 +68,12 @@ long RPParameterUtility::shiftNegativeValueForReading(ulong &val,int nbits){
         return shifted;
     }
     else return val;
+}
+
+int RPParameterUtility::getBitCount(std::string parameter){
+    int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
+    return nbits;
+
 }
 
 /**
@@ -156,10 +163,8 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
     try{
         int base_address=pll_base_addr[pll];
         int paramAddress=base_address+param_dict.at(parameter)[0];
-        int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
+        int nbits=getBitCount(parameter);
         float val_float = std::stof(value);
-
-
 
         long val_long{};
         ulong val_ulong{};
@@ -168,38 +173,49 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
         if (parameter=="a"||parameter=="phi"){ //TODO this has huge rounding errors, is there a better way to do it?
             std::string w_a{};
             std::string w_b{};
-            readParameter("w_a",w_a,pll);
-            readParameter("w_b",w_b,pll);
-            double a= sqrt(pow(std::stol(w_a),2)+pow(std::stol(w_b),2)); //current amplitude
-            double phi=atan2(std::stol(w_a),std::stol(w_b));//current phase
+            //readParameter("w_a",w_a,pll);
+            //readParameter("w_b",w_b,pll);
+            double a= amplitude_storage_pll[pll]; //current amplitude
+            double phi=phase_storage_pll[pll];//current phase
             if (parameter=="a"){//a gets a new value
                 a=std::stoul(value);
             }else if (parameter=="phi"){ //phi gets a new value
                 phi=std::stof(value)/360*(2*M_PI);
             }
-            long w_a_long=a*sin(phi);
-            long w_b_long=a*cos(phi);
-            setParameter("w_a",std::to_string(w_a_long),pll);
-            setParameter("w_b",std::to_string(w_b_long),pll);
+            long w_a_long=a*sin(phi);//new w_a
+            long w_b_long=a*cos(phi); //new w_b
+
+            ulong w_a_ulong=shiftNegativeValueForWriting(w_a_long,getBitCount("w_a"));//val_long;//
+            ulong w_b_ulong=shiftNegativeValueForWriting(w_b_long,getBitCount("w_b"));//val_long;//
+            converter.integrateParameter(pll,"w_a",w_a_ulong); //integrate the parameter into register because it is shared with other parameters
+            converter.integrateParameter(pll,"w_b",w_b_ulong); //integrate the parameter into register because it is shared with other parameters
+
+            unsigned long integratedValue=converter.getParameterRegister(pll,"w_a");//get the full register as a long representation
+            val_ulong=integratedValue;
+
+
+          //  setParameter("w_a",std::to_string(w_a_long),pll);
+           // setParameter("w_b",std::to_string(w_b_long),pll);
 
            /*bugfix: the amplitude tends to shift under phase changes.
             * Therefore, store the UI value here and set the amplitude again after setting the phase*/
             if (parameter=="a"){
-                pll==0?amplitude_storage_pll1=a:amplitude_storage_pll2=a;
+                amplitude_storage_pll[pll]=a;
+
             }
             if (parameter=="phi"){
-                pll==0?setParameter("a",std::to_string(amplitude_storage_pll1),pll): setParameter("a",std::to_string(amplitude_storage_pll2),pll);
-
+                phase_storage_pll[pll]=phi;
+                setParameter("a",std::to_string(amplitude_storage_pll[pll]),pll);//maybe this is not needed anymore?
             }
-            return 0;
+          //  return 0;
 
 
         }
 
-        if (parameter=="w_a"||parameter=="w_b"){
-            val_long=std::stol(value);
-            val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
-        }
+//        if (parameter=="w_a"||parameter=="w_b"){
+//            val_long=std::stol(value);
+//            val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
+//        }
 
         if (parameter=="2nd_harm"||parameter=="pid_en"){
             val_ulong=std::stoul(value);
@@ -240,7 +256,7 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
         //integration into registers for certain parameters
         if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
                 ||parameter=="output_2"||parameter=="2nd_harm"
-                ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
+                ||parameter=="pid_en"){//||parameter=="w_a"||parameter=="w_b"){
             converter.integrateParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
             unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
             val_ulong=integratedValue;
@@ -303,8 +319,7 @@ int RPParameterUtility::readParameter(std::string parameter,std::string &result,
     try{
         int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
 
-        unsigned long registerValue=readRegisterValueOfParameter(parameter,pll);//read register value at the address of the parameter
-        long parameterValue{};
+        //a and phi are special cases
 
         if (parameter=="a"){
             std::string w_a{};
@@ -330,6 +345,8 @@ int RPParameterUtility::readParameter(std::string parameter,std::string &result,
             return 0;
         }
 
+        unsigned long registerValue=readRegisterValueOfParameter(parameter,pll);//read register value at the address of the parameter
+        long parameterValue{};
 
         if (parameter=="f0"||parameter=="bw"){
             long scaledReply=registerValue/pow(2,32) *31.25*pow(10,6);
@@ -358,7 +375,7 @@ int RPParameterUtility::readParameter(std::string parameter,std::string &result,
                 if (!registerInSync){
                     emit log_message("Client-host register mismatch for parameter "+ parameter);
                     // return -1;
-                } //TODO reactivate
+                }
             }
             unsigned long extractedParameterValue=converter.extractParameter(pll,parameter,registerValue);
             if (parameter=="w_a"||parameter=="w_b"){

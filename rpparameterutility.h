@@ -97,6 +97,7 @@ private:
     ulong shiftNegativeValueForWriting(long &val,int nbits);
     long shiftNegativeValueForReading( ulong &val,int nbits);
     void logParameterChange(std::string parameter,int pll);
+    int getBitCount(std::string parameter);
 
 signals:
     void log_message(std::string message);
