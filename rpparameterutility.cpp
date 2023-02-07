@@ -342,7 +342,7 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
             }
             if (parameter=="phi"){
                 phase_storage_pll[pll]=phi;//store phase for speed
-                setParameter("a",std::to_string(amplitude_storage_pll[pll]),pll);//maybe this is not needed anymore?
+               // setParameter("a",std::to_string(amplitude_storage_pll[pll]),pll);//maybe this is not needed anymore?
             }
 
 
