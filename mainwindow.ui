@@ -1141,6 +1141,9 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSend_Command">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../../Downloads/295747.png</normaloff>../../Downloads/295747.png</iconset>
@@ -1150,6 +1153,9 @@
    </property>
   </action>
   <action name="actionLoad_Parameters">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Load Parameters</string>
    </property>

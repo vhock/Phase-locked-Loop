@@ -81,9 +81,9 @@ int RPParameterUtility::loadParametersFromFile(std::string fileName){
  * @return 0 if nothing went wrong
  */
 int RPParameterUtility::saveParameterstoFile(std::string fileName){
+   emit log_message("Saving parameters to file "+fileName+"...");
 
     validateRegisters=false; //registers do not match upon initial synchronization, no need to validate
-    emit log_message("Saving parameters to file "+fileName+"...");
 
     std::map<std::string,std::string> pll_parameter_map[2]{};
     std::map<std::string,std::string> pll_parameters_tmp;

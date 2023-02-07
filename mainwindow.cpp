@@ -163,16 +163,21 @@ void  MainWindow::connectionStateChangedListener(int code){
         ui->connectButton->setEnabled(false);
         rpParameterUtility.synchronizeParameters();
         rpSSHCommunicator.startMonitorActiveSession();
+        ui->actionLoad_Parameters->setEnabled(true);
+        ui->actionSend_Command->setEnabled(true);
         connectParameterInterface();
 
 
+
     }
-    if (code==0){
+    if (code==0){//inactive
         connectionIndicatorScene->clear();//i do not want to bother with finding the text for now
         connectionIndicatorScene->setBackgroundBrush(Qt::red); //online
         connectionIndicatorScene->addText("Offline");
         ui->disconnectButton->setEnabled(false);
         ui->connectButton->setEnabled(true);
+        ui->actionLoad_Parameters->setEnabled(false);
+        ui->actionSend_Command->setEnabled(false);
         disconnectParameterInterface();
 
     }
@@ -438,7 +443,11 @@ void MainWindow::on_actionSend_Command_triggered()
     QString suffix=QString::fromStdString(".param");
    QString fileName=  QFileDialog::getSaveFileName(this, "Save file", "set", suffix);
    fileName.append(suffix);
-   rpParameterUtility.saveParameterstoFile(fileName.toStdString());
+    logMessages("Saving parameters to file "+fileName.toStdString()+"...");
+
+    std::thread saveParameterThread(&RPParameterUtility::saveParameterstoFile,&rpParameterUtility,fileName.toStdString());
+    saveParameterThread.detach();
+  // rpParameterUtility.saveParameterstoFile(fileName.toStdString());
 
 
 }
