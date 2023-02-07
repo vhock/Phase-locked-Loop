@@ -435,12 +435,18 @@ void MainWindow::on_log_parameter_changes_cb_stateChanged(int arg1)
 void MainWindow::on_actionSend_Command_triggered()
 {
   //test map
-   // rpParameterUtility.saveParameters();
-    std::map<std::string,std::string> testMap{{"a","1"},{"b","2"}};
     QString suffix=QString::fromStdString(".param");
    QString fileName=  QFileDialog::getSaveFileName(this, "Save file", "set", suffix);
-   std::ofstream ofs(fileName.toStdString());
-   //boost::archive::text_oarchive oa(ofs);
+   fileName.append(suffix);
+   rpParameterUtility.saveParameters(fileName.toStdString());
 
+
+}
+
+
+void MainWindow::on_actionLoad_Parameters_triggered()
+{
+    QString parameterFile=QFileDialog::getOpenFileName(this,"Parameter file",{},"*.param");
+    rpParameterUtility.loadParameters(parameterFile.toStdString());
 }
 

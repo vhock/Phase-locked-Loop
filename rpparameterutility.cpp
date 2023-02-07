@@ -36,6 +36,146 @@ int amplitude_storage_pll[]{0,0};//bugfix: the amplitude tends to shift under ph
 double phase_storage_pll[]{0,0};//bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
 
 
+int RPParameterUtility::loadParameters(std::string fileName){
+    std::map<std::string,std::string> pll_parameter_map[2]{};
+    std::map<std::string,std::string> pll_parameters_tmp;
+    std::ifstream ifs(fileName);
+    std::string line{};
+
+    int pll{};
+    while(!ifs.eof()){
+        std::getline(ifs,line);
+        if (line.empty()){
+            break;
+        }
+        if (line=="0"){
+            pll=0;
+            continue;
+        }
+        if (line=="1"){
+            pll=1;
+            continue;
+        }
+        std::vector<std::string> v;
+        boost::split(v, line, boost::is_any_of(":"));
+        std::string parameter=v.at(0);
+        std::string value=v.at(1);
+        qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(v.at(0)+" has the value "+v.at(1)));
+        setParameter(parameter,value,pll);
+        emit parameterInitialValue(v.at(0),std::stod(v.at(1)),pll);
+
+
+    }
+   ifs.close();
+
+
+
+
+    return 0;
+}
+
+/**
+ * @brief RPParameterUtility::saveParameters
+ * Save the current parameters to a file
+ * @param fileName
+ * @return 0 if nothing went wrong
+ */
+int RPParameterUtility::saveParameters(std::string fileName){
+
+    validateRegisters=false; //registers do not match upon initial synchronization, no need to validate
+    emit log_message("Saving parameters..");
+
+    std::map<std::string,std::string> pll_parameter_map[2]{};
+    std::map<std::string,std::string> pll_parameters_tmp;
+    for (int pll=0;pll<2;pll++){
+        pll_parameters_tmp.clear();
+        for (auto const& elem : param_dict)
+        {
+
+            std::string parameter=elem.first;
+            std::string value;
+            if (((parameter=="output_1"||parameter=="output_2")&&pll==1)||parameter=="w_a"||parameter=="w_b"){//bugfix
+                continue;
+            }
+            readParameter(parameter,value,pll);
+            int base_address=pll_base_addr[pll];
+            int paramAddress=base_address+param_dict.at(parameter)[0];
+            int nbits=param_dict.at(parameter)[1]-param_dict.at(parameter)[2]+1;
+            float val_float = std::stof(value);
+            long val_long{};
+            ulong val_ulong{};
+            std::string value_string{};
+
+
+            if (parameter=="w_a"||parameter=="w_b"){
+                val_long=std::stol(value);
+                val_ulong=shiftNegativeValueForWriting(val_long,nbits);//val_long;//
+            }
+
+            if (parameter=="2nd_harm"||parameter=="pid_en"){
+                val_ulong=std::stoul(value);
+            }
+
+            if (parameter=="output_1"||parameter=="output_2"){
+                val_ulong=std::stoul(value);
+            }
+
+
+
+            if (parameter=="alpha"){
+                float scaled_float = val_float* pow(2,17);
+                val_ulong = static_cast<unsigned long>(scaled_float);
+            }
+
+            if (parameter=="order"){
+                val_ulong=static_cast<unsigned long>(val_float)-1;
+
+            }
+
+
+
+            //integration into registers for certain parameters
+            if (parameter=="alpha"||parameter=="order"||parameter=="output_1"
+                    ||parameter=="output_2"||parameter=="2nd_harm"
+                    ||parameter=="pid_en"||parameter=="w_a"||parameter=="w_b"){
+                converter.integrateParameter(pll,parameter,val_ulong); //integrate the parameter into register because it is shared with other parameters
+                unsigned long integratedValue=converter.getParameterRegister(pll,parameter);//get the full register as a long representation
+                val_ulong=integratedValue;
+            }
+
+
+            pll_parameters_tmp.emplace(parameter,value);
+            // qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
+
+
+            //emit parameterInitialValue(parameter,std::stod(value),pll);
+
+
+        }
+        pll_parameter_map[pll]=pll_parameters_tmp;
+
+
+    }
+
+
+    emit log_message("All parameters saved.");
+    validateRegisters=true; //restore this boolean so following parameter changes will validate the register
+
+
+    //save the stuff
+    std::ofstream ofs(fileName);
+    for (int pll=0;pll<2;pll++){
+        ofs << pll<<"\n";
+        for(auto& kv : pll_parameter_map[0]) {
+            ofs << kv.first<<":"<< kv.second<<"\n";
+        }
+    }
+
+    ofs.close();
+    //boost::archive::text_oarchive oa(ofs);
+    return 0;
+}
+
 /**
  * @brief RPUtility::shiftNegativeValueForWriting
  *  All Red Pitaya parameter values are postive, negative values are encoded by an offset relative to the maximum value
@@ -140,7 +280,7 @@ int RPParameterUtility::synchronizeParameters(){
                 val_ulong=integratedValue;
             }
 
-           // qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
+            // qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
             emit parameterInitialValue(parameter,std::stod(value),pll);
 
 
@@ -193,7 +333,7 @@ int RPParameterUtility::setParameter(std::string parameter,std::string value,int
             unsigned long integratedValue=converter.getParameterRegister(pll,"w_a");//get the full register as a long representation
             val_ulong=integratedValue;
 
-           /*bugfix: the amplitude tends to shift under phase changes.
+            /*bugfix: the amplitude tends to shift under phase changes.
             * Therefore, store the UI value here and set the amplitude again after setting the phase*/
             if (parameter=="a"){
                 amplitude_storage_pll[pll]=a;

@@ -51,6 +51,8 @@ private slots:
 
     void on_actionSend_Command_triggered();
 
+    void on_actionLoad_Parameters_triggered();
+
 private:
     Ui::MainWindow *ui;
     RPSSHCommunicator rpSSHCommunicator;

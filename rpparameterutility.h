@@ -6,7 +6,7 @@
 #define strcasecmp _stricmp
 #endif
 #include <boost/asio.hpp>
-#include <boost/serialization/serialization.hpp>
+#include <boost/algorithm/string.hpp>
 #include<libssh/libssh.h>
 #include<thread>
 #include <iostream>
@@ -50,7 +50,8 @@ public:
     void parameterChangedListener(std::string parameter,double value,int pll);
 
     int synchronizeParameters();
-    int saveParameters();
+    int saveParameters(std::string fileName);
+    int loadParameters(std::string fileName);
 
     bool logParameterChanges=false;//TODO should be private with getters/setters
     bool validateRegisters=false; //check if the local register models match the real registers in the RP
