@@ -45,7 +45,7 @@ private slots:
 
     void disableKeyBoardTracking();
 
-    void parameterInitialValueListener(std::string parameter,double value,int pll);
+    void parameterUIValueListener(std::string parameter,double value,int pll);
 
     void initConnectionIndicatorScene();
 

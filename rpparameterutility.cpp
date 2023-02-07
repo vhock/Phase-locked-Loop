@@ -36,7 +36,7 @@ int amplitude_storage_pll[]{0,0};//bugfix: the amplitude tends to shift under ph
 double phase_storage_pll[]{0,0};//bugfix: the amplitude tends to shift under phase changes. Therefore, store the UI value here and set the amplitude again after setting the phase
 
 
-int RPParameterUtility::loadParameters(std::string fileName){
+int RPParameterUtility::loadParametersFromFile(std::string fileName){
     std::map<std::string,std::string> pll_parameter_map[2]{};
     std::map<std::string,std::string> pll_parameters_tmp;
     std::ifstream ifs(fileName);
@@ -62,7 +62,7 @@ int RPParameterUtility::loadParameters(std::string fileName){
         std::string value=v.at(1);
         qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(v.at(0)+" has the value "+v.at(1)));
         setParameter(parameter,value,pll);
-        emit parameterInitialValue(v.at(0),std::stod(v.at(1)),pll);
+        emit parameterUIValue(v.at(0),std::stod(v.at(1)),pll);
 
 
     }
@@ -75,15 +75,15 @@ int RPParameterUtility::loadParameters(std::string fileName){
 }
 
 /**
- * @brief RPParameterUtility::saveParameters
+ * @brief RPParameterUtility::saveParameterstoFile
  * Save the current parameters to a file
  * @param fileName
  * @return 0 if nothing went wrong
  */
-int RPParameterUtility::saveParameters(std::string fileName){
+int RPParameterUtility::saveParameterstoFile(std::string fileName){
 
     validateRegisters=false; //registers do not match upon initial synchronization, no need to validate
-    emit log_message("Saving parameters..");
+    emit log_message("Saving parameters to file "+fileName+"...");
 
     std::map<std::string,std::string> pll_parameter_map[2]{};
     std::map<std::string,std::string> pll_parameters_tmp;
@@ -148,7 +148,7 @@ int RPParameterUtility::saveParameters(std::string fileName){
             // qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
 
 
-            //emit parameterInitialValue(parameter,std::stod(value),pll);
+            //emit parameterUIValue(parameter,std::stod(value),pll);
 
 
         }
@@ -166,7 +166,7 @@ int RPParameterUtility::saveParameters(std::string fileName){
     std::ofstream ofs(fileName);
     for (int pll=0;pll<2;pll++){
         ofs << pll<<"\n";
-        for(auto& kv : pll_parameter_map[0]) {
+        for(auto& kv : pll_parameter_map[pll]) {
             ofs << kv.first<<":"<< kv.second<<"\n";
         }
     }
@@ -281,7 +281,7 @@ int RPParameterUtility::synchronizeParameters(){
             }
 
             // qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(parameter+" has the value "+value));
-            emit parameterInitialValue(parameter,std::stod(value),pll);
+            emit parameterUIValue(parameter,std::stod(value),pll);
 
 
         }
@@ -612,12 +612,12 @@ unsigned long RPParameterUtility::readRegisterValueOfParameter(std::string param
 }
 
 /**
- * @brief parameterInitialValue emits the value of a parameter upon connection for the UI to deal with it
+ * @brief parameterUIValue emits the value of a parameter upon connection for the UI to deal with it
  * @param parameter
  * @param value
  * @param pll
  */
-void parameterInitialValue(std::string parameter,double value,int pll){
+void parameterUIValue(std::string parameter,double value,int pll){
 
 }
 

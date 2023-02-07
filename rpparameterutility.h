@@ -50,8 +50,8 @@ public:
     void parameterChangedListener(std::string parameter,double value,int pll);
 
     int synchronizeParameters();
-    int saveParameters(std::string fileName);
-    int loadParameters(std::string fileName);
+    int saveParameterstoFile(std::string fileName);
+    int loadParametersFromFile(std::string fileName);
 
     bool logParameterChanges=false;//TODO should be private with getters/setters
     bool validateRegisters=false; //check if the local register models match the real registers in the RP
@@ -102,7 +102,7 @@ private:
 
 signals:
     void log_message(std::string message);
-    void parameterInitialValue(std::string parameter,double value,int pll);// only once when the connection to the RP is made
+    void parameterUIValue(std::string parameter,double value,int pll);// only once when the connection to the RP is made
 
 
 

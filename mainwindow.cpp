@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     //connect UI parameter fields to the Red Pitaya utility
     //red pitaya listens to parameter changes sent by UI
     //UI listens to parameter synchronization signals sent by RPParameterUtility
-    QObject::connect(&rpParameterUtility,&RPParameterUtility::parameterInitialValue,this,&MainWindow::parameterInitialValueListener,Qt::AutoConnection);
+    QObject::connect(&rpParameterUtility,&RPParameterUtility::parameterUIValue,this,&MainWindow::parameterUIValueListener,Qt::AutoConnection);
 
 
     //SSH Connection
@@ -65,7 +65,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::parameterInitialValueListener(std::string parameter,double value,int pll){
+void MainWindow::parameterUIValueListener(std::string parameter,double value,int pll){
 
     //is there a more elgant way to do this?
     if (parameter=="output_1")
@@ -438,7 +438,7 @@ void MainWindow::on_actionSend_Command_triggered()
     QString suffix=QString::fromStdString(".param");
    QString fileName=  QFileDialog::getSaveFileName(this, "Save file", "set", suffix);
    fileName.append(suffix);
-   rpParameterUtility.saveParameters(fileName.toStdString());
+   rpParameterUtility.saveParameterstoFile(fileName.toStdString());
 
 
 }
@@ -447,6 +447,6 @@ void MainWindow::on_actionSend_Command_triggered()
 void MainWindow::on_actionLoad_Parameters_triggered()
 {
     QString parameterFile=QFileDialog::getOpenFileName(this,"Parameter file",{},"*.param");
-    rpParameterUtility.loadParameters(parameterFile.toStdString());
+    rpParameterUtility.loadParametersFromFile(parameterFile.toStdString());
 }
 
