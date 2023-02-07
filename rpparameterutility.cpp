@@ -37,6 +37,7 @@ double phase_storage_pll[]{0,0};//bugfix: the amplitude tends to shift under pha
 
 
 int RPParameterUtility::loadParametersFromFile(std::string fileName){
+    emit log_message("Reading parameters from file "+fileName);
     std::map<std::string,std::string> pll_parameter_map[2]{};
     std::map<std::string,std::string> pll_parameters_tmp;
     std::ifstream ifs(fileName);
@@ -60,7 +61,7 @@ int RPParameterUtility::loadParametersFromFile(std::string fileName){
         boost::split(v, line, boost::is_any_of(":"));
         std::string parameter=v.at(0);
         std::string value=v.at(1);
-        qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(v.at(0)+" has the value "+v.at(1)));
+        //qDebug()<<"Parameter "<<qPrintable(QString::fromStdString(v.at(0)+" has the value "+v.at(1)));
         setParameter(parameter,value,pll);
         emit parameterUIValue(v.at(0),std::stod(v.at(1)),pll);
 
@@ -69,7 +70,7 @@ int RPParameterUtility::loadParametersFromFile(std::string fileName){
    ifs.close();
 
 
-
+   emit log_message("All parameters updated.");
 
     return 0;
 }

@@ -443,7 +443,6 @@ void MainWindow::on_actionSend_Command_triggered()
     QString suffix=QString::fromStdString(".param");
    QString fileName=  QFileDialog::getSaveFileName(this, "Save file", "set", suffix);
    fileName.append(suffix);
-    logMessages("Saving parameters to file "+fileName.toStdString()+"...");
 
     std::thread saveParameterThread(&RPParameterUtility::saveParameterstoFile,&rpParameterUtility,fileName.toStdString());
     saveParameterThread.detach();
@@ -456,6 +455,8 @@ void MainWindow::on_actionSend_Command_triggered()
 void MainWindow::on_actionLoad_Parameters_triggered()
 {
     QString parameterFile=QFileDialog::getOpenFileName(this,"Parameter file",{},"*.param");
-    rpParameterUtility.loadParametersFromFile(parameterFile.toStdString());
+    //std::thread loadParameterThread(&RPParameterUtility::loadParametersFromFile,&rpParameterUtility,parameterFile.toStdString());
+    //loadParameterThread.detach(); //bad idea
+  rpParameterUtility.loadParametersFromFile(parameterFile.toStdString());
 }
 
