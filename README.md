@@ -26,8 +26,8 @@ The "Send shell command" box allows for sending an arbitrary UNIX command to the
 ***WARNING***
 Parameters can be varied quickly using the spin boxes, however especially for request-heavy actions such as varying A or PHI this can result in "spamming" the Red Pitaya with an amount of SSH requests that leads to connection errors. If this occurs, a reconnect has to be done.
 
-#Known bugs
-##Phase-amplitude error
+# Known bugs
+## Phase-amplitude error
 Phase values are converted to a radians value and converted to an integer value on the PLL. This leads to rounding errors, limiting the phase precision to ~2-3 deg.
 ##Low-amplitude phase insensitivity
 At low amplitudes (a<5), phase changes might not be transferred to the PLL. This is due to the intertwinement of phase and amplitude on the PLL. Generally, phase changes should become more precise at high amplitudes.
