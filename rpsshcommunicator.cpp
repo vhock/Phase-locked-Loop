@@ -167,7 +167,7 @@ int RPSSHCommunicator::verify_knownhost()
         }
         rc = ssh_session_update_known_hosts(active_session);
         if (rc < 0) {
-            fprintf(stderr, "Error %s\n", strerror_s(buf,800,errno));
+            fprintf(stderr, "Error %s\n", strerror_r(errno,buf,800));
             return -1;
         }
         break;
@@ -307,7 +307,7 @@ void RPSSHCommunicator::monitorActiveSession(){
                 return;
             }
         }
-        Sleep(5000); //checking on the connection every few seconds is enough
+        sleep(5000); //checking on the connection every few seconds is enough
 
     }
 }
