@@ -535,7 +535,7 @@ int RPParameterUtility::readParameter(std::string parameter,std::string &result,
         }
 
         if (result.empty()){
-            result=std::to_string(-99999);
+            result=std::to_string(-MAXINT);
             emit  log_message("Reading parameter "+parameter+" failed.");
             return -1;
         }

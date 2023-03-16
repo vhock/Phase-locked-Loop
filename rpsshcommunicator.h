@@ -9,7 +9,7 @@
 #include<libssh/libssh.h>
 #include<thread>
 #include <iostream>
-//#include <conio.h>
+#include <conio.h>
 #include <stdlib.h>     //for using the function sleep
 #include <exception>
 #include <QObject>
@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <QResource>
-#include <QFile>
+#include <Qfile>
 #include <map>
 #include <array>
 #include <bitset>

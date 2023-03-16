@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
-include("/opt/vcpkg/scripts/buildsystems/vcpkg.cmake")#might be needed ?
+include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")#might be needed ?
 set(Boost_USE_STATIC_LIBS ON) #deploy only
 find_package(libssh CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread regex date_time)
